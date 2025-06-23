@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: ['javascript', 'typescript']
+        language: ['typescript']
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -58,6 +58,7 @@ jobs:
         
       - name: Run Snyk vulnerability scan
         uses: snyk/actions/node@master
+        if: ${{ secrets.SNYK_TOKEN }}
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
@@ -65,6 +66,7 @@ jobs:
           
       - name: Upload Snyk results
         uses: github/codeql-action/upload-sarif@v3
+        if: ${{ secrets.SNYK_TOKEN }}
         with:
           sarif_file: snyk.sarif
 
