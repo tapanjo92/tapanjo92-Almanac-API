@@ -17,12 +17,13 @@ The project's philosophy is centered on **data quality as a product**. A rigorou
 
 Based on extensive experience designing and scaling SaaS platforms, I've identified several critical enhancements:
 
-1. **Multi-Region Architecture**: Deploy across multiple AWS regions (us-east-1, eu-west-1, ap-southeast-2) from day one to serve global customers with ultra-low latency.
-2. **Event-Driven Architecture**: Implement EventBridge for all async operations, enabling better decoupling and future extensibility.
-3. **API Versioning Strategy**: Build versioning into the API design from the start to ensure backward compatibility.
-4. **Observability Stack**: Implement OpenTelemetry with X-Ray for distributed tracing and CloudWatch Logs Insights for centralized logging.
-5. **Cost Optimization**: Leverage Lambda SnapStart for Java functions and Graviton2 processors where applicable.
-6. **Compliance Framework**: Build SOC 2 and GDPR compliance controls from the beginning.
+1. **Authentication-First Architecture**: AWS Amplify Gen 2 with Cognito User Pools and Identity Pools as the mandatory authentication layer for all user interactions.
+2. **Single-Region Deployment**: Initial deployment in ap-south-1 (Mumbai) with future multi-region expansion capability.
+3. **Event-Driven Architecture**: Implement EventBridge for all async operations, enabling better decoupling and future extensibility.
+4. **API Versioning Strategy**: Build versioning into the API design from the start to ensure backward compatibility.
+5. **Observability Stack**: Implement OpenTelemetry with X-Ray for distributed tracing and CloudWatch Logs Insights for centralized logging.
+6. **Cost Optimization**: Leverage Lambda SnapStart for Java functions and Graviton2 processors where applicable.
+7. **Compliance Framework**: Build SOC 2 and GDPR compliance controls from the beginning with Cognito's built-in compliance features.
 
 ### 2.0 Product Specification
 
@@ -62,47 +63,56 @@ Future paid tiers will expand on the core offering with features including: ICS 
 
 ### 3.0 System Architecture
 
-The system is designed using a serverless-first AWS architecture to ensure scalability, resilience, and low operational overhead.
+The system is designed using a serverless-first AWS architecture with mandatory AWS Amplify Gen 2 authentication.
 
 ```text
-┌─────────────── Multi-Region Active-Active Architecture ─────────────────┐
+┌─────────────── Single-Region Architecture (ap-south-1) ─────────────────┐
 │                                                                         │
-│  Region: us-east-1           Region: eu-west-1      Region: ap-southeast-2 │
-│         │                           │                        │          │
-│         ▼                           ▼                        ▼          │
-│                                                                         │
-│                        Route 53 (Geolocation Routing)                  │
-│                                   │                                     │
-│                                   ▼                                     │
-│      ┌────────────────────────────────────────────────────┐           │
-│      │              CloudFront (Global Edge Network)       │           │
-│      │         - Origin Shield for cost optimization       │           │
-│      │         - Custom error pages & 30s TTL defaults     │           │
-│      └────────────────────────────────────────────────────┘           │
-│                    │                          │                         │
-│                    ▼                          ▼                         │
-│         ┌──── API Gateway ────┐      ┌─── S3 Static Assets ───┐       │
-│         │  - Usage Plans      │      │  - Pre-rendered ICS    │       │
-│         │  - API Keys         │      │  - Documentation       │       │
-│         │  - Request Val.     │      │  - OpenAPI Specs      │       │
-│         └─────────────────────┘      └────────────────────────┘       │
-│                    │                                                    │
-│                    ▼                                                    │
-│         ┌──── Lambda Functions ────────────────────────┐               │
-│         │  - Runtime: Node.js 20.x on ARM64           │               │
-│         │  - Memory: 512MB (tuned via PowerTools)     │               │
-│         │  - Provisioned Concurrency for critical     │               │
-│         │  - Dead Letter Queue for failed requests    │               │
-│         └──────────────────────────────────────────────┘               │
-│                    │                          │                         │
-│                    ▼                          ▼                         │
-│         ┌─── DynamoDB Global Tables ──┐   External APIs               │
-│         │  - On-Demand Billing       │   - Amazon Location Service    │
-│         │  - Point-in-Time Recovery  │   - Fallback timezone API      │
-│         │  - DAX for microsec reads  │                                │
-│         └─────────────────────────────┘                                │
-│                                                                         │
-└─────────────────────────────────────────────────────────────────────────┘
+│                    AWS Amplify Gen 2 Frontend                          │
+│                    - Next.js 14 with TypeScript                        │
+│                    - Amplify UI Authenticator                          │
+│                    - Hosted on Amplify Hosting                         │
+│                              │                                         │
+│                              ▼                                         │
+│                 ┌─── AWS Cognito (Mandatory) ───┐                     │
+│                 │  - User Pools for Auth        │                     │
+│                 │  - Identity Pools for AWS     │                     │
+│                 │  - User Groups (Tiers)        │                     │
+│                 │  - MFA & Social Login         │                     │
+│                 └────────────┬──────────────────┘                     │
+│                              │                                         │
+│                              ▼                                         │
+│      ┌────────────────────────────────────────────────────┐          │
+│      │              CloudFront (Global Edge Network)       │          │
+│      │         - Origin Shield for cost optimization       │          │
+│      │         - Custom error pages & 30s TTL defaults     │          │
+│      └────────────────────────────────────────────────────┘          │
+│                    │                          │                        │
+│                    ▼                          ▼                        │
+│         ┌──── API Gateway ────┐      ┌─── S3 Static Assets ───┐      │
+│         │  - Cognito Auth     │      │  - Pre-rendered ICS    │      │
+│         │  - Usage Plans      │      │  - User uploads (auth) │      │
+│         │  - API Keys         │      │  - Documentation       │      │
+│         │  - Request Val.     │      │  - OpenAPI Specs      │      │
+│         └─────────────────────┘      └────────────────────────┘      │
+│                    │                                                   │
+│                    ▼                                                   │
+│         ┌──── Lambda Functions ────────────────────────┐              │
+│         │  - Runtime: Node.js 20.x on ARM64           │              │
+│         │  - Memory: 512MB (tuned via PowerTools)     │              │
+│         │  - Cognito triggers for auth flows          │              │
+│         │  - IAM roles per user group                 │              │
+│         └──────────────────────────────────────────────┘              │
+│                    │                          │                        │
+│                    ▼                          ▼                        │
+│         ┌─── DynamoDB Tables ─────┐   ┌─── External APIs ────┐       │
+│         │  - On-Demand Billing    │   │  - Amazon Location   │       │
+│         │  - Point-in-Time Rec.   │   │  - Fallback APIs     │       │
+│         │  - DAX for caching      │   └──────────────────────┘       │
+│         │  - User-specific data   │                                   │
+│         └─────────────────────────┘                                   │
+│                                                                        │
+└────────────────────────────────────────────────────────────────────────┘
 
                     Data Pipeline Architecture
 ┌────────────────────────────────────────────────────────────────────┐
@@ -138,10 +148,12 @@ The system is designed using a serverless-first AWS architecture to ensure scala
     - Security headers (HSTS, CSP, X-Frame-Options)
     
   * **AWS API Gateway (HTTP API)**:
-    - JWT authorizers for authentication
+    - Cognito authorizers for authentication (mandatory)
+    - API keys for public endpoints with usage plans
     - Request/response validation using JSON Schema
     - Custom domain with ACM certificate
     - WAF integration for protection against OWASP Top 10
+    - Integration with Amplify Auth for user context
     
   * **AWS Lambda**:
     - TypeScript with strict typing
@@ -236,30 +248,40 @@ The system is designed using a serverless-first AWS architecture to ensure scala
 
 #### 5.1 Security Architecture
 
+  * **Authentication & Authorization (Mandatory)**:
+    - AWS Cognito User Pools for all user authentication
+    - Cognito Identity Pools for temporary AWS credentials
+    - Multi-factor authentication (MFA) enforcement
+    - User groups mapped to IAM roles (Free, Starter, Growth, Enterprise)
+    - Fine-grained access control via JWT claims
+    
   * **Network Security**:
     - AWS WAF with managed rule sets
-    - AWS Shield Advanced for DDoS protection
+    - AWS Shield Standard for DDoS protection
     - VPC endpoints for AWS services
     - Network ACLs and Security Groups
     
   * **Application Security**:
+    - Amplify Gen 2 security best practices
     - OWASP dependency scanning (Snyk/Dependabot)
     - SAST with SonarQube
     - DAST with OWASP ZAP
-    - Secrets rotation every 90 days
-    - mTLS for service-to-service communication
+    - Secrets managed by Amplify backend
+    - Cognito-based API authentication
     
   * **Data Security**:
     - Encryption at rest (AES-256)
     - Encryption in transit (TLS 1.3)
     - Field-level encryption for PII
+    - Row-level security in DynamoDB based on Cognito sub
     - Data masking in non-prod environments
     
   * **Compliance**:
-    - SOC 2 Type II controls
+    - SOC 2 Type II controls (Cognito compliant)
     - GDPR compliance (EU customers)
     - CCPA compliance (California)
     - ISO 27001 alignment
+    - HIPAA-eligible with Cognito
 
 #### 5.2 Reliability Engineering
 
@@ -275,10 +297,11 @@ The system is designed using a serverless-first AWS architecture to ensure scala
     - Graceful degradation
     
   * **Disaster Recovery**:
-    - Multi-region active-active
-    - Automated failover via Route 53
+    - Single-region with multi-AZ deployment
+    - Automated backup and restore
     - Regular DR drills
     - Runbook automation
+    - Future multi-region expansion capability
 
 ### 6.0 Monitoring and Observability Stack
 
@@ -318,16 +341,17 @@ The development plan is structured to validate the most significant risks first.
 
 | Day | Deliverable | Key Goal |
 | :--- | :--- | :--- |
-| 1-2 | **Spike 1: Multi-Region PoC** | Validate DynamoDB Global Tables replication latency < 1s. Set up basic CloudFormation. **(Go/No-Go)** |
-| 3-4 | **Spike 2: Data Pipeline Complexity** | Implement Step Functions workflow with manual approval gate. Test with real AU/UK/DE data. **(Go/No-Go)** |
-| 5-6 | Implement core Lambda functions with TypeScript, unit tests (90% coverage target), and error handling | Build resilient business logic layer |
-| 7-8 | Set up API Gateway with authentication, rate limiting, and request validation | Secure API layer complete |
-| 9 | Configure DynamoDB, DAX, and implement data access patterns | Data layer optimized for performance |
-| 10 | Deploy CloudFront, S3, and implement caching strategy | CDN and static asset delivery ready |
-| 11 | Implement monitoring stack with CloudWatch dashboards and X-Ray | Full observability achieved |
-| 12 | Set up CI/CD with GitHub Actions, automated testing, and security scanning | DevOps pipeline operational |
-| 13 | Conduct load testing (10K TPS target) and chaos engineering | Validate scalability and resilience |
-| 14 | Documentation, API playground, and soft launch preparation | Developer experience polished |
+| 1 | **Phase 0: CDK Infrastructure** | Deploy DynamoDB, S3, Glue infrastructure in ap-south-1. **(Go/No-Go)** |
+| 2-3 | **Spike 1: Amplify Gen 2 + Cognito** | Set up Amplify project with authentication, user pools, identity pools. Test auth flows. **(Go/No-Go)** |
+| 4 | **Spike 2: Data Pipeline Validation** | Implement Step Functions workflow with manual approval. Test with real AU/UK/DE data. **(Go/No-Go)** |
+| 5-6 | Implement core Lambda functions with TypeScript, Cognito triggers, unit tests (90% coverage) | Build auth-aware business logic |
+| 7-8 | Set up API Gateway with Cognito authorizers, API keys, rate limiting | Secure API layer with auth |
+| 9 | Configure DynamoDB with row-level security, DAX, implement data access patterns | Auth-based data isolation |
+| 10 | Deploy CloudFront, S3 with signed URLs, Amplify hosting | Secure content delivery |
+| 11 | Implement monitoring stack with CloudWatch, X-Ray, Amplify Analytics | Full observability |
+| 12 | Frontend development with Amplify UI components, protected routes | User-facing application |
+| 13 | Integration testing, load testing (10K TPS), security audit | Validate auth at scale |
+| 14 | Documentation, developer portal with auth, API playground | Authenticated developer experience |
 
 ### 8.0 Financial Model (Detailed TCO Analysis)
 

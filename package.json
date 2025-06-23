@@ -1,0 +1,37 @@
+{
+  "name": "almanac-api",
+  "version": "1.0.0",
+  "description": "Global Holidays & Time-Zones API - Serverless SaaS Platform",
+  "main": "index.js",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "cdk": "cdk",
+    "build": "tsc",
+    "watch": "tsc -w",
+    "test": "jest",
+    "deploy:dev": "cdk deploy --all --context env=dev --require-approval never",
+    "deploy:prod": "cdk deploy --all --context env=prod --require-approval never",
+    "synth": "cdk synth",
+    "diff": "cdk diff",
+    "destroy": "cdk destroy --all",
+    "preinstall": "npx only-allow pnpm"
+  },
+  "author": "Almanac API Team",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "@types/node": "20.11.24",
+    "aws-cdk": "2.147.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2",
+    "typescript": "~5.4.3"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "2.147.0",
+    "constructs": "^10.0.0",
+    "source-map-support": "^0.5.21"
+  }
+}

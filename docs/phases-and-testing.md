@@ -1,41 +1,97 @@
 # Almanac API: Implementation Phases and Testing Strategy
 
-**Version: 1.0**
+**Version: 2.0 - With AWS Amplify Gen 2 & Cognito**
 **Date: 2025-06-23**
 **Author: Senior Cloud Architect**
 
 ## Overview
 
-This document outlines the detailed implementation phases for the Almanac API project. Each phase is broken down into sub-phases with specific testing requirements. The approach follows a risk-first methodology, validating critical assumptions early and building upon a solid foundation.
+This document outlines the detailed implementation phases for the Almanac API project with mandatory AWS Amplify Gen 2 and Cognito authentication. Each phase is broken down into sub-phases with specific testing requirements. The approach follows a risk-first methodology, validating critical assumptions early and building upon a solid foundation.
 
-## Phase 0: Foundation and Risk Validation (Days 1-4)
+## Phase 0: Foundation Infrastructure (Day 1)
 
-### Sub-Phase 0.1: Multi-Region Infrastructure PoC (Day 1-2)
-**Objective**: Validate multi-region architecture feasibility and performance
+### Sub-Phase 0.1: CDK Infrastructure Deployment
+**Objective**: Deploy core infrastructure in ap-south-1 using AWS CDK
 
 #### Tasks:
-1. Set up AWS accounts and organizations structure
-2. Configure AWS Control Tower for multi-account governance
-3. Deploy basic VPCs in 3 regions (us-east-1, eu-west-1, ap-southeast-2)
-4. Implement DynamoDB Global Tables PoC
-5. Test cross-region replication latency
+1. Set up AWS account and configure credentials
+2. Bootstrap CDK in ap-south-1 region
+3. Deploy Phase0Stack with DynamoDB tables
+4. Deploy S3 buckets for data pipeline
+5. Set up Glue database and IAM roles
 
 #### Testing Requirements:
-- **Unit Tests**: IAM policy validation scripts
+- **Unit Tests**: CDK stack tests (100% coverage)
 - **Integration Tests**: 
-  - Cross-region connectivity tests
-  - DynamoDB replication latency < 1 second
-  - Route 53 health check validation
-- **Performance Tests**: Measure baseline latencies between regions
+  - DynamoDB table creation and configuration
+  - S3 bucket policies and encryption
+  - IAM role permissions
+- **Performance Tests**: DynamoDB read/write latency baseline
 - **Security Tests**: AWS Config rule compliance validation
 
 #### Exit Criteria:
-- [ ] Replication latency consistently < 1 second
-- [ ] All regions can communicate securely
-- [ ] Cost projections validated
+- [ ] All infrastructure resources deployed successfully
+- [ ] DynamoDB tables accessible with proper IAM
+- [ ] S3 buckets configured with encryption and versioning
 - [ ] **Go/No-Go Decision Point**
 
-### Sub-Phase 0.2: Data Pipeline Validation (Day 3-4)
+## Phase 0.5: Amplify Gen 2 & Cognito Setup (Days 2-3)
+
+### Sub-Phase 0.5.1: Amplify Project Initialization
+**Objective**: Set up Amplify Gen 2 with mandatory Cognito authentication
+
+#### Tasks:
+1. Initialize Amplify Gen 2 project
+2. Configure Cognito User Pools with custom attributes
+3. Set up Identity Pools for AWS credential access
+4. Define user groups (Free, Starter, Growth, Enterprise)
+5. Configure social identity providers
+
+#### Testing Requirements:
+- **Unit Tests**: 
+  - Auth configuration validation
+  - User pool schema tests
+  - Group permissions validation
+- **Integration Tests**:
+  - User registration flow
+  - Email verification
+  - MFA enrollment
+  - Social login (Google, GitHub)
+- **Security Tests**:
+  - Password policy enforcement
+  - Token expiration
+  - Session management
+
+#### Exit Criteria:
+- [ ] Cognito User Pool deployed and configured
+- [ ] Identity Pool with proper IAM role mappings
+- [ ] User groups created with correct permissions
+- [ ] **Go/No-Go Decision Point**
+
+### Sub-Phase 0.5.2: Cognito Lambda Triggers
+**Objective**: Implement custom authentication workflows
+
+#### Tasks:
+1. Pre-signup Lambda for domain validation
+2. Post-confirmation Lambda for user initialization
+3. Custom message Lambda for branded emails
+4. Pre-token generation Lambda for custom claims
+5. User migration Lambda (if needed)
+
+#### Testing Requirements:
+- **Unit Tests**: Each Lambda function (95% coverage)
+- **Integration Tests**:
+  - End-to-end signup flow
+  - Custom email delivery
+  - Token claim validation
+- **Performance Tests**: Lambda cold start optimization
+
+#### Exit Criteria:
+- [ ] All Lambda triggers deployed and tested
+- [ ] Custom authentication flows working
+- [ ] Email branding applied
+
+### Sub-Phase 0.3: Data Pipeline Validation (Day 4)
 **Objective**: Prove data ingestion and quality pipeline works with real data
 
 #### Tasks:
@@ -136,15 +192,16 @@ This document outlines the detailed implementation phases for the Almanac API pr
 
 ## Phase 2: API Development (Days 7-9)
 
-### Sub-Phase 2.1: Lambda Functions Core Logic (Day 7-8)
-**Objective**: Implement business logic with high reliability
+### Sub-Phase 2.1: Lambda Functions Core Logic (Day 5-6)
+**Objective**: Implement business logic with Cognito integration
 
 #### Tasks:
 1. Set up TypeScript project with strict configuration
-2. Implement /holidays endpoint logic
-3. Implement /business-days calculator
-4. Implement /timezone lookup with fallback
-5. Create shared Lambda layers
+2. Implement /holidays endpoint with auth context
+3. Implement /business-days calculator with user preferences
+4. Implement /timezone lookup with usage tracking
+5. Create shared Lambda layers with Amplify SDK
+6. Implement Cognito trigger functions
 
 #### Testing Requirements:
 - **Unit Tests** (90% coverage target):
@@ -168,15 +225,16 @@ This document outlines the detailed implementation phases for the Almanac API pr
 - [ ] 90% code coverage achieved
 - [ ] Performance within SLA targets
 
-### Sub-Phase 2.2: API Gateway Configuration (Day 8-9)
-**Objective**: Create secure, performant API layer
+### Sub-Phase 2.2: API Gateway Configuration (Day 7-8)
+**Objective**: Create secure API layer with Cognito authentication
 
 #### Tasks:
-1. Define OpenAPI 3.0 specifications
-2. Configure API Gateway with request validation
-3. Implement JWT authorizers
-4. Set up usage plans and API keys
-5. Configure WAF rules
+1. Define OpenAPI 3.0 specifications with auth
+2. Configure API Gateway with Cognito authorizers
+3. Implement API key generation for authenticated users
+4. Set up usage plans tied to Cognito user groups
+5. Configure WAF rules and request validation
+6. Map Cognito groups to API access levels
 
 #### Testing Requirements:
 - **API Tests**:
@@ -184,8 +242,11 @@ This document outlines the detailed implementation phases for the Almanac API pr
   - Request/response validation
   - Error handling scenarios
 - **Security Tests**:
-  - Authentication/authorization flows
-  - Rate limiting effectiveness
+  - Cognito authentication flows
+  - JWT token validation
+  - User group authorization
+  - API key management
+  - Rate limiting per user tier
   - WAF rule validation
   - OWASP Top 10 protection
 - **Load Tests**:
@@ -211,14 +272,15 @@ This document outlines the detailed implementation phases for the Almanac API pr
 ## Phase 3: Data Layer and Caching (Days 9-10)
 
 ### Sub-Phase 3.1: DynamoDB and DAX Implementation (Day 9)
-**Objective**: Optimize data storage and retrieval
+**Objective**: Optimize data storage with user isolation
 
 #### Tasks:
-1. Implement data access patterns
-2. Configure DynamoDB Global Tables
-3. Set up DAX clusters in each region
-4. Create data seeding scripts
+1. Implement data access patterns with Cognito sub
+2. Configure DynamoDB with row-level security
+3. Set up DAX cluster in ap-south-1
+4. Create user-specific data partitions
 5. Implement backup strategies
+6. Add user usage tracking table
 
 #### Testing Requirements:
 - **Unit Tests**:
@@ -461,15 +523,45 @@ This document outlines the detailed implementation phases for the Almanac API pr
 - **Cost Optimization**: Identify and implement savings
 - **Performance Certification**: Benchmark against competitors
 
-## Phase 7: Launch Preparation (Day 14)
+## Phase 7: Frontend Development & Launch (Days 12-14)
 
-### Sub-Phase 7.1: Documentation and Developer Experience (Day 14)
-**Objective**: Ensure excellent developer experience
+### Sub-Phase 7.1: Amplify Frontend Development (Day 12)
+**Objective**: Build authenticated user interface
+
+#### Tasks:
+1. Set up Next.js with Amplify Gen 2
+2. Implement Amplify UI Authenticator
+3. Create protected routes and navigation
+4. Build user dashboard with API key management
+5. Implement usage analytics views
+6. Add subscription management UI
+
+#### Testing Requirements:
+- **Unit Tests**: React component tests
+- **Integration Tests**: 
+  - Auth flow end-to-end
+  - API calls with tokens
+  - Protected route access
+- **E2E Tests**: Playwright scenarios
+- **Accessibility Tests**: WCAG compliance
+
+### Sub-Phase 7.2: Developer Portal (Day 13)
+**Objective**: Create authenticated developer experience
+
+#### Tasks:
+1. Build API documentation portal
+2. Implement interactive API playground
+3. Create code examples with auth
+4. Add API key generation UI
+5. Build usage dashboard
+
+### Sub-Phase 7.3: Launch Preparation (Day 14)
+**Objective**: Final validation and go-live
 
 #### Tasks:
 1. Complete API documentation
-2. Create developer portal
-3. Build SDK examples
+2. Security audit with auth flows
+3. Performance validation at scale
 4. Create video tutorials
 5. Set up support channels
 
@@ -541,20 +633,23 @@ This document outlines the detailed implementation phases for the Almanac API pr
 - **Reliability**: 99.95% availability target
 
 ### Testing Tools:
-- **Unit Testing**: Jest, Mocha
-- **Integration Testing**: Postman, Newman
-- **Load Testing**: K6, JMeter
-- **Security Testing**: OWASP ZAP, Snyk
-- **Monitoring**: CloudWatch, X-Ray
+- **Unit Testing**: Jest with Amplify mocks
+- **Integration Testing**: Postman with Cognito auth, Newman
+- **Auth Testing**: AWS Amplify test utilities
+- **Load Testing**: K6 with authenticated scenarios, JMeter
+- **Security Testing**: OWASP ZAP, Snyk, AWS Security Hub
+- **Monitoring**: CloudWatch, X-Ray, Amplify Analytics
 
 ## Risk Mitigation Through Testing
 
 ### High-Risk Areas (Extra Testing Focus):
-1. **Multi-Region Data Consistency**: Extensive consistency testing
-2. **Third-Party API Dependencies**: Circuit breaker validation
-3. **Data Quality Pipeline**: Comprehensive validation rules
-4. **Security Boundaries**: Penetration testing
-5. **Performance at Scale**: Progressive load testing
+1. **Authentication & Authorization**: Cognito flows, token validation, group permissions
+2. **User Data Isolation**: Row-level security, multi-tenancy validation
+3. **Third-Party API Dependencies**: Circuit breaker validation
+4. **Data Quality Pipeline**: Comprehensive validation rules
+5. **API Rate Limiting**: Per-user tier enforcement
+6. **Security Boundaries**: Penetration testing with auth
+7. **Performance at Scale**: Progressive load testing with auth overhead
 
 ### Contingency Planning:
 - **Feature Flags**: Enable quick feature rollback

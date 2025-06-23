@@ -1,6 +1,7 @@
 # Dependencies
 node_modules/
 *.lock
+pnpm-lock.yaml
 
 # Build outputs
 dist/
