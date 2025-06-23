@@ -4,6 +4,7 @@ import * as cdk from 'aws-cdk-lib';
 import { Phase0Stack } from '../lib/stacks/phase0-stack';
 import { Phase1Stack } from '../lib/stacks/phase1-stack';
 import { DataPipelineStack } from '../lib/stacks/data-pipeline-stack';
+import { ApiGatewayStack } from '../lib/stacks/api-gateway-stack';
 import { getConfig } from '../lib/config';
 
 const app = new cdk.App();
@@ -31,14 +32,23 @@ const dataPipelineStack = new DataPipelineStack(app, `AlmanacAPI-DataPipeline-${
   description: 'Almanac API Data Pipeline: ETL jobs, validation, and orchestration',
 });
 
-// Phase 1: Core Infrastructure (Lambda, API Gateway)
+// Phase 1: Core Infrastructure (Lambda functions)
 const phase1Stack = new Phase1Stack(app, `AlmanacAPI-Phase1-${env}`, {
   env: stackEnv,
   config: config,
   phase0Stack: phase0Stack,
-  description: 'Almanac API Phase 1: Core Infrastructure (Lambda, API Gateway)',
+  description: 'Almanac API Phase 1: Core Infrastructure (Lambda functions)',
+});
+
+// Phase 2.2: API Gateway
+const apiGatewayStack = new ApiGatewayStack(app, `AlmanacAPI-APIGateway-${env}`, {
+  env: stackEnv,
+  config: config,
+  phase1Stack: phase1Stack,
+  description: 'Almanac API Phase 2.2: API Gateway with endpoints and usage plans',
 });
 
 // Add dependencies
 dataPipelineStack.addDependency(phase0Stack);
 phase1Stack.addDependency(phase0Stack);
+apiGatewayStack.addDependency(phase1Stack);
