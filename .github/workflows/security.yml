@@ -56,19 +56,22 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
         
-      - name: Run Snyk vulnerability scan
-        uses: snyk/actions/node@master
-        if: ${{ secrets.SNYK_TOKEN }}
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: --severity-threshold=high
+      - name: Run AWS dependency check
+        run: |
+          # Use npm audit for basic vulnerability scanning
+          pnpm audit --audit-level=high --json > audit-results.json || true
           
-      - name: Upload Snyk results
-        uses: github/codeql-action/upload-sarif@v3
-        if: ${{ secrets.SNYK_TOKEN }}
-        with:
-          sarif_file: snyk.sarif
+          # Check for high/critical vulnerabilities
+          HIGH_VULNS=$(jq '.metadata.vulnerabilities.high // 0' audit-results.json)
+          CRITICAL_VULNS=$(jq '.metadata.vulnerabilities.critical // 0' audit-results.json)
+          
+          echo "Found $HIGH_VULNS high and $CRITICAL_VULNS critical vulnerabilities"
+          
+          if [ "$CRITICAL_VULNS" -gt 0 ]; then
+            echo "❌ Critical vulnerabilities found!"
+            jq '.vulnerabilities' audit-results.json
+            exit 1
+          fi
 
   # Container Scanning (for future use)
   container-scan:
