@@ -1,0 +1,42 @@
+version: 2
+updates:
+  # JavaScript/TypeScript dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 10
+    assignees:
+      - "tapanjo92"
+    labels:
+      - "dependencies"
+      - "security"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    groups:
+      aws-sdk:
+        patterns:
+          - "@aws-sdk/*"
+          - "aws-sdk"
+      development:
+        dependency-type: "development"
+        
+  # Lambda layer dependencies
+  - package-ecosystem: "npm"
+    directory: "/layers/shared-deps/nodejs"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "lambda-layer"
+      
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "github-actions"

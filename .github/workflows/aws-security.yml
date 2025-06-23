@@ -1,0 +1,199 @@
+name: AWS Security Scanning
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 0 * * *' # Daily security scans
+
+permissions:
+  contents: read
+  security-events: write
+  id-token: write # For OIDC
+
+env:
+  AWS_REGION: ap-south-1
+
+jobs:
+  # AWS CodeGuru Reviewer
+  codeguru-review:
+    name: CodeGuru Code Review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+          
+      - name: AWS CodeGuru Reviewer
+        uses: aws-actions/codeguru-reviewer@v1.1
+        with:
+          s3_bucket: almanac-api-codeguru-${{ github.run_id }}
+          build_path: .
+
+  # AWS Security Hub Findings
+  security-hub-scan:
+    name: Security Hub Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+          
+      - name: Run Security Hub checks
+        run: |
+          # Enable Security Hub if not already enabled
+          aws securityhub describe-hub || aws securityhub enable-security-hub
+          
+          # Run compliance check
+          aws securityhub get-compliance-summary \
+            --query 'ComplianceScore' \
+            --output json > security-score.json
+            
+          # Check for critical findings
+          CRITICAL_COUNT=$(aws securityhub get-findings \
+            --filters '{"SeverityLabel":[{"Value":"CRITICAL","Comparison":"EQUALS"}]}' \
+            --query 'Findings | length(@)')
+            
+          if [ "$CRITICAL_COUNT" -gt 0 ]; then
+            echo "⚠️ Found $CRITICAL_COUNT critical security findings"
+            exit 1
+          fi
+
+  # ECR Vulnerability Scanning (if using containers)
+  ecr-scan:
+    name: ECR Image Scanning
+    runs-on: ubuntu-latest
+    if: false # Enable when you have ECR images
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+          
+      - name: Scan ECR images
+        run: |
+          # Get scan results for your images
+          aws ecr describe-image-scan-findings \
+            --repository-name almanac-api \
+            --image-id imageTag=latest \
+            --query 'imageScanFindings.findingSeverityCounts'
+
+  # AWS Inspector for Lambda functions
+  inspector-scan:
+    name: Inspector Lambda Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+          
+      - name: Enable Inspector for Lambda
+        run: |
+          # List Lambda functions
+          FUNCTIONS=$(aws lambda list-functions \
+            --query "Functions[?starts_with(FunctionName, 'almanac-api-')].FunctionName" \
+            --output text)
+            
+          # Enable Inspector scanning for each function
+          for func in $FUNCTIONS; do
+            echo "Scanning Lambda function: $func"
+            aws inspector2 list-findings \
+              --filter-criteria '{"resourceType":[{"comparison":"EQUALS","value":"AWS_LAMBDA_FUNCTION"}]}' \
+              --query "findings[?resourceId=='$func']"
+          done
+
+  # AWS CloudWatch Code Insights
+  code-insights:
+    name: CloudWatch Application Insights
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 8
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: 'pnpm'
+          
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        
+      - name: Run tests with coverage
+        run: |
+          pnpm test -- --coverage --coverageReporters=json
+          
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+          
+      - name: Upload metrics to CloudWatch
+        run: |
+          # Extract coverage percentage
+          COVERAGE=$(node -e "console.log(require('./coverage/coverage-final.json').total.lines.pct)")
+          
+          # Send custom metric to CloudWatch
+          aws cloudwatch put-metric-data \
+            --namespace "AlmanacAPI/CodeQuality" \
+            --metric-name "CodeCoverage" \
+            --value "$COVERAGE" \
+            --unit "Percent" \
+            --dimensions Project=AlmanacAPI,Environment=dev
+
+  # AWS Trusted Advisor checks
+  trusted-advisor:
+    name: Trusted Advisor Security Checks
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' # Run daily
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1 # Trusted Advisor requires us-east-1
+          
+      - name: Get Trusted Advisor security findings
+        run: |
+          # Get security-related checks
+          aws support describe-trusted-advisor-checks \
+            --language en \
+            --query "checks[?category=='Security']" > security-checks.json
+            
+          # Get check results
+          CHECK_IDS=$(jq -r '.[].id' security-checks.json)
+          for check_id in $CHECK_IDS; do
+            aws support describe-trusted-advisor-check-result \
+              --check-id "$check_id" \
+              --language en
+          done

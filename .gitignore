@@ -1,7 +1,7 @@
 # Dependencies
 node_modules/
 *.lock
-pnpm-lock.yaml
+# pnpm-lock.yaml should be committed
 
 # Build outputs
 dist/
@@ -27,9 +27,7 @@ cdk.context.json
 Thumbs.db
 
 # Environment
-.env
-.env.local
-.env.*.local
+.env*
 
 # Logs
 *.log

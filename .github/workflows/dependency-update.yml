@@ -1,0 +1,53 @@
+name: Dependency Update
+
+on:
+  schedule:
+    - cron: '0 0 * * MON' # Every Monday at midnight
+  workflow_dispatch:
+
+jobs:
+  update-dependencies:
+    name: Update Dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 8
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: 'pnpm'
+          
+      - name: Update dependencies
+        run: |
+          pnpm update --interactive false
+          cd layers/shared-deps/nodejs && pnpm update --interactive false
+          
+      - name: Run tests
+        run: |
+          pnpm install
+          pnpm test
+          
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'chore: update dependencies'
+          title: 'chore: weekly dependency updates'
+          body: |
+            ## Weekly Dependency Updates
+            
+            This PR contains automatic dependency updates.
+            
+            ### Checklist
+            - [ ] All tests pass
+            - [ ] No breaking changes identified
+            - [ ] Security vulnerabilities addressed
+          branch: deps/update-dependencies
+          delete-branch: true

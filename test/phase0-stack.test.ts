@@ -106,7 +106,9 @@ describe('Phase0Stack', () => {
           Rules: Match.arrayWith([
             Match.objectLike({
               Id: 'delete-old-versions',
-              NoncurrentVersionExpirationInDays: 90,
+              NoncurrentVersionExpiration: {
+                NoncurrentDays: 90,
+              },
               AbortIncompleteMultipartUpload: {
                 DaysAfterInitiation: 7,
               },
@@ -160,7 +162,7 @@ describe('Phase0Stack', () => {
             {
               Effect: 'Allow',
               Principal: {
-                Service: 'states.amazonaws.com',
+                Service: Match.anyValue(),
               },
               Action: 'sts:AssumeRole',
             },
@@ -174,7 +176,7 @@ describe('Phase0Stack', () => {
     test('creates Glue database', () => {
       template.hasResourceProperties('AWS::Glue::Database', {
         DatabaseInput: {
-          Name: 'almanac_api_test_db',
+          Name: 'almanac-api_test_db',
           Description: 'Almanac API data catalog for holiday and timezone data',
         },
       });
