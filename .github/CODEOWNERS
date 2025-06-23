@@ -1,0 +1,20 @@
+# Code Owners for Almanac API
+
+# Global owners
+* @tapanjo92
+
+# Infrastructure and CDK
+/infrastructure/ @tapanjo92
+/lib/stacks/ @tapanjo92
+*.ts @tapanjo92
+
+# Lambda functions
+/src/lambdas/ @tapanjo92
+
+# GitHub Actions and CI/CD
+/.github/ @tapanjo92
+
+# Security-sensitive files
+/.env* @tapanjo92
+/cdk.json @tapanjo92
+/tsconfig.json @tapanjo92
