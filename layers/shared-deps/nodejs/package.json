@@ -1,0 +1,12 @@
+{
+  "name": "almanac-api-shared-deps",
+  "version": "1.0.0",
+  "description": "Shared dependencies for Almanac API Lambda functions",
+  "dependencies": {
+    "@aws-lambda-powertools/logger": "^2.0.0",
+    "@aws-lambda-powertools/tracer": "^2.0.0",
+    "@aws-lambda-powertools/metrics": "^2.0.0",
+    "@aws-sdk/client-dynamodb": "^3.600.0",
+    "@aws-sdk/lib-dynamodb": "^3.600.0"
+  }
+}

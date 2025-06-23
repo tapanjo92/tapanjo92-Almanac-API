@@ -249,7 +249,7 @@ export class Phase0Stack extends cdk.Stack {
   private createStepFunctionsRole(config: AlmanacConfig): iam.Role {
     const role = new iam.Role(this, 'StepFunctionsRole', {
       roleName: `${config.projectName}-${config.environment}-stepfunctions-role`,
-      assumedBy: new iam.ServicePrincipal('states.amazonaws.com'),
+      assumedBy: new iam.ServicePrincipal(`states.${this.region}.amazonaws.com`),
     });
 
     // Add permissions for invoking Lambda functions
