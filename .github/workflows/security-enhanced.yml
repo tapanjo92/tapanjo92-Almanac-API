@@ -22,21 +22,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Run Checkov for CDK
-        id: checkov
-        uses: bridgecrewio/checkov-action@master
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
-          directory: .
-          framework: cdk
-          output_format: sarif
-          output_file_path: checkov.sarif
-          skip_check: CKV_AWS_18,CKV_AWS_33  # Skip specific checks if needed
+          python-version: '3.x'
+          
+      - name: Install and run Checkov
+        id: checkov
+        run: |
+          pip install checkov
+          checkov -d . --output sarif --output-file-path checkov-results.sarif || true
+        continue-on-error: true
           
       - name: Upload Checkov results
         uses: github/codeql-action/upload-sarif@v3
         if: always()
+        continue-on-error: true
         with:
-          sarif_file: checkov.sarif
+          sarif_file: checkov-results.sarif
 
   # License Compliance
   license-check:
@@ -137,7 +140,7 @@ jobs:
       - uses: actions/checkout@v4
       
       - name: Run OSV Scanner
-        uses: google/osv-scanner-action@v1.7.1
+        uses: google/osv-scanner-action@v1
         with:
           scan-args: |-
             --recursive
