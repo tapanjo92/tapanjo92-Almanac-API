@@ -1,0 +1,614 @@
+{
+  "timestamp": "2025-06-24T11:19:01.522036",
+  "target": "https://d1f3xis8nbs3on.cloudfront.net/",
+  "tests": [
+    {
+      "test": "No Auth - holidays",
+      "status": "PASS",
+      "details": {
+        "endpoint": "holidays?country=AU&year=2024",
+        "status_code": 403,
+        "expected": 403,
+        "response": "{\"message\":\"Forbidden\"}"
+      },
+      "timestamp": "2025-06-24T11:19:01.576912"
+    },
+    {
+      "test": "No Auth - business-days",
+      "status": "PASS",
+      "details": {
+        "endpoint": "business-days?startDate=2024-01-01&endDate=2024-01-31&country=AU",
+        "status_code": 403,
+        "expected": 403,
+        "response": "{\"message\":\"Forbidden\"}"
+      },
+      "timestamp": "2025-06-24T11:19:01.627378"
+    },
+    {
+      "test": "No Auth - timezones",
+      "status": "PASS",
+      "details": {
+        "endpoint": "timezones?country=AU",
+        "status_code": 403,
+        "expected": 403,
+        "response": "{\"message\":\"Forbidden\"}"
+      },
+      "timestamp": "2025-06-24T11:19:01.676546"
+    },
+    {
+      "test": "Invalid Auth - invalid_key_123...",
+      "status": "PASS",
+      "details": {
+        "auth_header": "invalid_key_123",
+        "status_code": 403,
+        "expected": 403,
+        "response": "{\"message\":\"Forbidden\"}"
+      },
+      "timestamp": "2025-06-24T11:19:01.731313"
+    },
+    {
+      "test": "Invalid Auth - alm_invalid123456789...",
+      "status": "PASS",
+      "details": {
+        "auth_header": "alm_invalid123456789",
+        "status_code": 403,
+        "expected": 403,
+        "response": "{\"message\":\"Forbidden\"}"
+      },
+      "timestamp": "2025-06-24T11:19:01.777214"
+    },
+    {
+      "test": "Invalid Auth - Bearer invalid.jwt.t...",
+      "status": "PASS",
+      "details": {
+        "auth_header": "Bearer invalid.jwt.token",
+        "status_code": 403,
+        "expected": 403,
+        "response": "{\"message\":\"Forbidden\"}"
+      },
+      "timestamp": "2025-06-24T11:19:01.826475"
+    },
+    {
+      "test": "Invalid Auth - ' OR '1'='1...",
+      "status": "PASS",
+      "details": {
+        "auth_header": "' OR '1'='1",
+        "status_code": 403,
+        "expected": 403,
+        "response": "{\"message\":\"Forbidden\"}"
+      },
+      "timestamp": "2025-06-24T11:19:01.873481"
+    },
+    {
+      "test": "Invalid Auth - <script>alert('xss')...",
+      "status": "PASS",
+      "details": {
+        "auth_header": "<script>alert('xss')</script>",
+        "status_code": 403,
+        "expected": 403,
+        "response": "{\"message\":\"Forbidden\"}"
+      },
+      "timestamp": "2025-06-24T11:19:01.923447"
+    },
+    {
+      "test": "Invalid Auth - ../../../etc/passwd...",
+      "status": "PASS",
+      "details": {
+        "auth_header": "../../../etc/passwd",
+        "status_code": 403,
+        "expected": 403,
+        "response": "{\"message\":\"Forbidden\"}"
+      },
+      "timestamp": "2025-06-24T11:19:01.973495"
+    },
+    {
+      "test": "Invalid Auth - alm_aaaaaaaaaaaaaaaa...",
+      "status": "PASS",
+      "details": {
+        "auth_header": "alm_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "status_code": 403,
+        "expected": 403,
+        "response": "{\"message\":\"Forbidden\"}"
+      },
+      "timestamp": "2025-06-24T11:19:02.026976"
+    },
+    {
+      "test": "SQL Injection - country",
+      "status": "PASS",
+      "details": {
+        "parameter": "country",
+        "payload": "AU' OR '1'='1",
+        "status_code": 403,
+        "sql_error_found": false,
+        "response_snippet": "{\"message\":\"Forbidden\"}"
+      },
+      "timestamp": "2025-06-24T11:19:02.087825"
+    },
+    {
+      "test": "SQL Injection - country",
+      "status": "PASS",
+      "details": {
+        "parameter": "country",
+        "payload": "AU'; DROP TABLE holidays; --",
+        "status_code": 403,
+        "sql_error_found": false,
+        "response_snippet": "{\"message\":\"Forbidden\"}"
+      },
+      "timestamp": "2025-06-24T11:19:02.135881"
+    },
+    {
+      "test": "SQL Injection - year",
+      "status": "PASS",
+      "details": {
+        "parameter": "year",
+        "payload": "2024 OR 1=1",
+        "status_code": 403,
+        "sql_error_found": false,
+        "response_snippet": "{\"message\":\"Forbidden\"}"
+      },
+      "timestamp": "2025-06-24T11:19:02.185597"
+    },
+    {
+      "test": "SQL Injection - year",
+      "status": "PASS",
+      "details": {
+        "parameter": "year",
+        "payload": "2024'; SELECT * FROM users; --",
+        "status_code": 403,
+        "sql_error_found": false,
+        "response_snippet": "{\"message\":\"Forbidden\"}"
+      },
+      "timestamp": "2025-06-24T11:19:02.233863"
+    },
+    {
+      "test": "SQL Injection - month",
+      "status": "PASS",
+      "details": {
+        "parameter": "month",
+        "payload": "12 UNION SELECT * FROM api_keys",
+        "status_code": 403,
+        "sql_error_found": false,
+        "response_snippet": "{\"message\":\"Forbidden\"}"
+      },
+      "timestamp": "2025-06-24T11:19:02.283577"
+    },
+    {
+      "test": "SQL Injection - type",
+      "status": "PASS",
+      "details": {
+        "parameter": "type",
+        "payload": "public' AND SLEEP(5)--",
+        "status_code": 403,
+        "sql_error_found": false,
+        "response_snippet": "{\"message\":\"Forbidden\"}"
+      },
+      "timestamp": "2025-06-24T11:19:02.332231"
+    },
+    {
+      "test": "SQL Injection - region",
+      "status": "PASS",
+      "details": {
+        "parameter": "region",
+        "payload": "NSW' OR EXISTS(SELECT * FROM information_schema.tables)--",
+        "status_code": 403,
+        "sql_error_found": false,
+        "response_snippet": "{\"message\":\"Forbidden\"}"
+      },
+      "timestamp": "2025-06-24T11:19:02.387639"
+    },
+    {
+      "test": "XSS Test - country parameter",
+      "status": "PASS",
+      "details": {
+        "payload": "<script>alert('XSS')</script>",
+        "reflected": false,
+        "status_code": 403,
+        "response_snippet": "{\"message\":\"Forbidden\"}"
+      },
+      "timestamp": "2025-06-24T11:19:02.435781"
+    },
+    {
+      "test": "XSS Test - country parameter",
+      "status": "PASS",
+      "details": {
+        "payload": "<img src=x onerror=alert('XSS')>",
+        "reflected": false,
+        "status_code": 403,
+        "response_snippet": "{\"message\":\"Forbidden\"}"
+      },
+      "timestamp": "2025-06-24T11:19:02.480746"
+    },
+    {
+      "test": "XSS Test - country parameter",
+      "status": "PASS",
+      "details": {
+        "payload": "javascript:alert('XSS')",
+        "reflected": false,
+        "status_code": 403,
+        "response_snippet": "{\"message\":\"Forbidden\"}"
+      },
+      "timestamp": "2025-06-24T11:19:02.530163"
+    },
+    {
+      "test": "XSS Test - country parameter",
+      "status": "PASS",
+      "details": {
+        "payload": "<svg onload=alert('XSS')>",
+        "reflected": false,
+        "status_code": 403,
+        "response_snippet": "{\"message\":\"Forbidden\"}"
+      },
+      "timestamp": "2025-06-24T11:19:02.579863"
+    },
+    {
+      "test": "XSS Test - country parameter",
+      "status": "PASS",
+      "details": {
+        "payload": "'><script>alert(String.fromCharCode(88,83,83))</script>",
+        "reflected": false,
+        "status_code": 403,
+        "response_snippet": "{\"message\":\"Forbidden\"}"
+      },
+      "timestamp": "2025-06-24T11:19:02.630172"
+    },
+    {
+      "test": "XSS Test - country parameter",
+      "status": "PASS",
+      "details": {
+        "payload": "<iframe src='javascript:alert(`XSS`)'></iframe>",
+        "reflected": false,
+        "status_code": 403,
+        "response_snippet": "{\"message\":\"Forbidden\"}"
+      },
+      "timestamp": "2025-06-24T11:19:02.681464"
+    },
+    {
+      "test": "XSS Test - country parameter",
+      "status": "PASS",
+      "details": {
+        "payload": "<input onfocus=alert('XSS') autofocus>",
+        "reflected": false,
+        "status_code": 403,
+        "response_snippet": "{\"message\":\"Forbidden\"}"
+      },
+      "timestamp": "2025-06-24T11:19:02.730808"
+    },
+    {
+      "test": "Rate Limiting - No Auth",
+      "status": "FAIL",
+      "details": {
+        "requests_made": 50,
+        "rate_limit_hit": false,
+        "message": "No rate limit encountered"
+      },
+      "timestamp": "2025-06-24T11:19:05.102819"
+    },
+    {
+      "test": "Rate Limiting - Concurrent",
+      "status": "WARNING",
+      "details": {
+        "concurrent_requests": 0,
+        "rate_limited": 0
+      },
+      "timestamp": "2025-06-24T11:19:05.715195"
+    },
+    {
+      "test": "CORS Test - https://evil.com",
+      "status": "PASS",
+      "details": {
+        "origin": "https://evil.com",
+        "cors_headers": {
+          "Access-Control-Allow-Origin": null,
+          "Access-Control-Allow-Credentials": null,
+          "Access-Control-Allow-Methods": null,
+          "Access-Control-Allow-Headers": null
+        },
+        "origin_reflected": false
+      },
+      "timestamp": "2025-06-24T11:19:05.797125"
+    },
+    {
+      "test": "CORS Test - http://localhost:3000",
+      "status": "PASS",
+      "details": {
+        "origin": "http://localhost:3000",
+        "cors_headers": {
+          "Access-Control-Allow-Origin": null,
+          "Access-Control-Allow-Credentials": null,
+          "Access-Control-Allow-Methods": null,
+          "Access-Control-Allow-Headers": null
+        },
+        "origin_reflected": false
+      },
+      "timestamp": "2025-06-24T11:19:05.837743"
+    },
+    {
+      "test": "CORS Test - https://example.com",
+      "status": "PASS",
+      "details": {
+        "origin": "https://example.com",
+        "cors_headers": {
+          "Access-Control-Allow-Origin": null,
+          "Access-Control-Allow-Credentials": null,
+          "Access-Control-Allow-Methods": null,
+          "Access-Control-Allow-Headers": null
+        },
+        "origin_reflected": false
+      },
+      "timestamp": "2025-06-24T11:19:05.874234"
+    },
+    {
+      "test": "CORS Test - null",
+      "status": "PASS",
+      "details": {
+        "origin": "null",
+        "cors_headers": {
+          "Access-Control-Allow-Origin": null,
+          "Access-Control-Allow-Credentials": null,
+          "Access-Control-Allow-Methods": null,
+          "Access-Control-Allow-Headers": null
+        },
+        "origin_reflected": false
+      },
+      "timestamp": "2025-06-24T11:19:05.911755"
+    },
+    {
+      "test": "TLS/SSL Configuration",
+      "status": "FAIL",
+      "details": {
+        "protocol": "TLSv1.3",
+        "cipher": [
+          "TLS_AES_128_GCM_SHA256",
+          "TLSv1.3",
+          128
+        ],
+        "certificate_cn": "*.cloudfront.net",
+        "days_until_expiry": 303,
+        "weak_protocol": true
+      },
+      "timestamp": "2025-06-24T11:19:05.946183"
+    },
+    {
+      "test": "Parameter Validation - Invalid country code",
+      "status": "FAIL",
+      "details": {
+        "endpoint": "holidays",
+        "parameters": {
+          "country": "XX",
+          "year": "2024"
+        },
+        "status_code": 403,
+        "expected": 400,
+        "response": "{\"message\":\"Forbidden\"}"
+      },
+      "timestamp": "2025-06-24T11:19:05.995671"
+    },
+    {
+      "test": "Parameter Validation - Numeric country code",
+      "status": "FAIL",
+      "details": {
+        "endpoint": "holidays",
+        "parameters": {
+          "country": "123",
+          "year": "2024"
+        },
+        "status_code": 403,
+        "expected": 400,
+        "response": "{\"message\":\"Forbidden\"}"
+      },
+      "timestamp": "2025-06-24T11:19:06.044662"
+    },
+    {
+      "test": "Parameter Validation - Empty country code",
+      "status": "FAIL",
+      "details": {
+        "endpoint": "holidays",
+        "parameters": {
+          "country": "",
+          "year": "2024"
+        },
+        "status_code": 403,
+        "expected": 400,
+        "response": "{\"message\":\"Forbidden\"}"
+      },
+      "timestamp": "2025-06-24T11:19:06.091864"
+    },
+    {
+      "test": "Parameter Validation - Very long country code",
+      "status": "FAIL",
+      "details": {
+        "endpoint": "holidays",
+        "parameters": {
+          "country": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+          "year": "2024"
+        },
+        "status_code": 403,
+        "expected": 400,
+        "response": "{\"message\":\"Forbidden\"}"
+      },
+      "timestamp": "2025-06-24T11:19:06.141950"
+    },
+    {
+      "test": "Parameter Validation - Year too old",
+      "status": "FAIL",
+      "details": {
+        "endpoint": "holidays",
+        "parameters": {
+          "country": "AU",
+          "year": "1800"
+        },
+        "status_code": 403,
+        "expected": 400,
+        "response": "{\"message\":\"Forbidden\"}"
+      },
+      "timestamp": "2025-06-24T11:19:06.188198"
+    },
+    {
+      "test": "Parameter Validation - Year too far in future",
+      "status": "FAIL",
+      "details": {
+        "endpoint": "holidays",
+        "parameters": {
+          "country": "AU",
+          "year": "3000"
+        },
+        "status_code": 403,
+        "expected": 400,
+        "response": "{\"message\":\"Forbidden\"}"
+      },
+      "timestamp": "2025-06-24T11:19:06.237487"
+    },
+    {
+      "test": "Parameter Validation - Non-numeric year",
+      "status": "FAIL",
+      "details": {
+        "endpoint": "holidays",
+        "parameters": {
+          "country": "AU",
+          "year": "abc"
+        },
+        "status_code": 403,
+        "expected": 400,
+        "response": "{\"message\":\"Forbidden\"}"
+      },
+      "timestamp": "2025-06-24T11:19:06.285746"
+    },
+    {
+      "test": "Parameter Validation - Negative year",
+      "status": "FAIL",
+      "details": {
+        "endpoint": "holidays",
+        "parameters": {
+          "country": "AU",
+          "year": "-2024"
+        },
+        "status_code": 403,
+        "expected": 400,
+        "response": "{\"message\":\"Forbidden\"}"
+      },
+      "timestamp": "2025-06-24T11:19:06.332640"
+    },
+    {
+      "test": "Parameter Validation - Decimal year",
+      "status": "FAIL",
+      "details": {
+        "endpoint": "holidays",
+        "parameters": {
+          "country": "AU",
+          "year": "2024.5"
+        },
+        "status_code": 403,
+        "expected": 400,
+        "response": "{\"message\":\"Forbidden\"}"
+      },
+      "timestamp": "2025-06-24T11:19:06.379915"
+    },
+    {
+      "test": "Parameter Validation - Invalid date format",
+      "status": "FAIL",
+      "details": {
+        "endpoint": "business-days",
+        "parameters": {
+          "startDate": "invalid",
+          "endDate": "2024-01-31",
+          "country": "AU"
+        },
+        "status_code": 403,
+        "expected": 400,
+        "response": "{\"message\":\"Forbidden\"}"
+      },
+      "timestamp": "2025-06-24T11:19:06.428179"
+    },
+    {
+      "test": "Parameter Validation - Invalid month",
+      "status": "FAIL",
+      "details": {
+        "endpoint": "business-days",
+        "parameters": {
+          "startDate": "2024-13-01",
+          "endDate": "2024-01-31",
+          "country": "AU"
+        },
+        "status_code": 403,
+        "expected": 400,
+        "response": "{\"message\":\"Forbidden\"}"
+      },
+      "timestamp": "2025-06-24T11:19:06.476152"
+    },
+    {
+      "test": "Parameter Validation - Invalid day",
+      "status": "FAIL",
+      "details": {
+        "endpoint": "business-days",
+        "parameters": {
+          "startDate": "2024-01-32",
+          "endDate": "2024-01-31",
+          "country": "AU"
+        },
+        "status_code": 403,
+        "expected": 400,
+        "response": "{\"message\":\"Forbidden\"}"
+      },
+      "timestamp": "2025-06-24T11:19:06.524222"
+    },
+    {
+      "test": "Parameter Validation - End before start",
+      "status": "FAIL",
+      "details": {
+        "endpoint": "business-days",
+        "parameters": {
+          "startDate": "2024-01-31",
+          "endDate": "2024-01-01",
+          "country": "AU"
+        },
+        "status_code": 403,
+        "expected": 400,
+        "response": "{\"message\":\"Forbidden\"}"
+      },
+      "timestamp": "2025-06-24T11:19:06.574661"
+    },
+    {
+      "test": "Parameter Validation - Missing year",
+      "status": "FAIL",
+      "details": {
+        "endpoint": "holidays",
+        "parameters": {
+          "country": "AU"
+        },
+        "status_code": 403,
+        "expected": 400,
+        "response": "{\"message\":\"Forbidden\"}"
+      },
+      "timestamp": "2025-06-24T11:19:06.623115"
+    },
+    {
+      "test": "Parameter Validation - Missing country",
+      "status": "FAIL",
+      "details": {
+        "endpoint": "holidays",
+        "parameters": {
+          "year": "2024"
+        },
+        "status_code": 403,
+        "expected": 400,
+        "response": "{\"message\":\"Forbidden\"}"
+      },
+      "timestamp": "2025-06-24T11:19:06.673050"
+    },
+    {
+      "test": "Parameter Validation - Missing country",
+      "status": "FAIL",
+      "details": {
+        "endpoint": "business-days",
+        "parameters": {
+          "startDate": "2024-01-01",
+          "endDate": "2024-01-31"
+        },
+        "status_code": 403,
+        "expected": 400,
+        "response": "{\"message\":\"Forbidden\"}"
+      },
+      "timestamp": "2025-06-24T11:19:06.720557"
+    }
+  ]
+}
