@@ -1,0 +1,471 @@
+openapi: 3.0.3
+info:
+  title: Almanac API
+  description: |
+    The Almanac API provides access to holiday data, business day calculations, and timezone information
+    for multiple countries. All endpoints require an API key for access.
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@almanac-api.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://api.almanac.dev/v1
+    description: Production server
+  - url: https://api-staging.almanac.dev/v1
+    description: Staging server
+
+security:
+  - ApiKeyAuth: []
+
+paths:
+  /holidays:
+    get:
+      summary: Get holidays for a country
+      description: Returns a list of holidays for the specified country and optional filters
+      operationId: getHolidays
+      tags:
+        - Holidays
+      parameters:
+        - name: country
+          in: query
+          description: ISO country code (AU, UK, DE, etc.)
+          required: true
+          schema:
+            type: string
+            pattern: '^[A-Z]{2}$'
+            example: AU
+        - name: year
+          in: query
+          description: Year to retrieve holidays for
+          required: true
+          schema:
+            type: integer
+            minimum: 2020
+            maximum: 2030
+            example: 2024
+        - name: month
+          in: query
+          description: Month to filter holidays (1-12)
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 12
+            example: 12
+        - name: type
+          in: query
+          description: Type of holiday to filter
+          required: false
+          schema:
+            type: string
+            enum: [public, bank, observance]
+            example: public
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      country:
+                        type: string
+                        example: AU
+                      year:
+                        type: string
+                        example: "2024"
+                      month:
+                        type: string
+                        example: "all"
+                      type:
+                        type: string
+                        example: "all"
+                      holidays:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Holiday'
+                  metadata:
+                    $ref: '#/components/schemas/Metadata'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /business-days:
+    post:
+      summary: Calculate business days
+      description: Calculates the end date after adding/subtracting business days from a start date
+      operationId: calculateBusinessDays
+      tags:
+        - Business Days
+      requestBody:
+        description: Business days calculation request
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - startDate
+                - days
+                - country
+              properties:
+                startDate:
+                  type: string
+                  format: date
+                  description: Start date in YYYY-MM-DD format
+                  example: "2024-01-15"
+                days:
+                  type: integer
+                  description: Number of business days to add (positive) or subtract (negative)
+                  minimum: -365
+                  maximum: 365
+                  example: 10
+                country:
+                  type: string
+                  pattern: '^[A-Z]{2}$'
+                  description: ISO country code for holiday calculations
+                  example: AU
+                region:
+                  type: string
+                  description: Region/state code for region-specific holidays
+                  example: NSW
+                includeWeekends:
+                  type: boolean
+                  description: Include weekends in the calculation
+                  default: false
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  startDate:
+                    type: string
+                    format: date
+                    description: The start date provided
+                    example: "2024-01-15"
+                  endDate:
+                    type: string
+                    format: date
+                    description: The calculated end date
+                    example: "2024-01-29"
+                  businessDays:
+                    type: integer
+                    description: Number of business days requested
+                    example: 10
+                  totalDays:
+                    type: integer
+                    description: Total calendar days between start and end
+                    example: 14
+                  weekendDays:
+                    type: integer
+                    description: Number of weekend days skipped
+                    example: 4
+                  holidays:
+                    type: array
+                    description: Holiday dates that were skipped
+                    items:
+                      type: string
+                      format: date
+                    example: ["2024-01-26"]
+                  country:
+                    type: string
+                    description: Country code used
+                    example: AU
+                  region:
+                    type: string
+                    description: Region code used (if provided)
+                    example: NSW
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /timezones:
+    get:
+      summary: Get timezone information
+      description: Returns timezone information for geographic coordinates
+      operationId: getTimezones
+      tags:
+        - Timezones
+      parameters:
+        - name: lat
+          in: query
+          description: Latitude coordinate
+          required: true
+          schema:
+            type: number
+            format: double
+            minimum: -90
+            maximum: 90
+            example: -33.8688
+        - name: lng
+          in: query
+          description: Longitude coordinate
+          required: true
+          schema:
+            type: number
+            format: double
+            minimum: -180
+            maximum: 180
+            example: 151.2093
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  latitude:
+                    type: number
+                    description: The latitude coordinate provided
+                    example: -33.8688
+                  longitude:
+                    type: number
+                    description: The longitude coordinate provided
+                    example: 151.2093
+                  timezone:
+                    type: string
+                    description: IANA timezone identifier
+                    example: "Australia/Sydney"
+                  offset:
+                    type: string
+                    description: Current UTC offset
+                    example: "+10:00"
+                  dst:
+                    type: boolean
+                    description: Whether daylight saving time is active
+                    example: true
+                  location:
+                    type: string
+                    description: Location description (if available)
+                    example: "Sydney, Australia"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /health:
+    get:
+      summary: Health check endpoint
+      description: Returns the health status of the API
+      operationId: healthCheck
+      tags:
+        - System
+      security: []
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: healthy
+                  timestamp:
+                    type: string
+                    format: date-time
+                  version:
+                    type: string
+                    example: "1.0.0"
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key for authentication
+
+  schemas:
+    Holiday:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+          example: "2024-12-25"
+        name:
+          type: string
+          example: "Christmas Day"
+        type:
+          type: string
+          enum: [public, bank, observance]
+          example: public
+        country:
+          type: string
+          example: AU
+        country_name:
+          type: string
+          example: Australia
+        year:
+          type: integer
+          example: 2024
+        month:
+          type: integer
+          example: 12
+        day:
+          type: integer
+          example: 25
+        day_of_week:
+          type: string
+          example: Wednesday
+        is_weekend:
+          type: boolean
+          example: false
+        is_fixed:
+          type: boolean
+          example: true
+        counties:
+          type: array
+          items:
+            type: string
+          nullable: true
+
+    Timezone:
+      type: object
+      properties:
+        timezone:
+          type: string
+          example: "Australia/Sydney"
+        timezone_name:
+          type: string
+          example: "Australia/Sydney"
+        timezone_abbr:
+          type: string
+          example: "AEDT"
+        country:
+          type: string
+          example: AU
+        country_name:
+          type: string
+          example: Australia
+        city:
+          type: string
+          example: Sydney
+        state:
+          type: string
+          example: NSW
+          nullable: true
+        utc_offset:
+          type: integer
+          example: 39600
+        utc_offset_hours:
+          type: number
+          example: 11
+        dst_offset:
+          type: integer
+          example: 3600
+        has_dst:
+          type: boolean
+          example: true
+        is_dst_active:
+          type: boolean
+          example: true
+
+    Metadata:
+      type: object
+      properties:
+        requestId:
+          type: string
+          example: "abc123-def456-ghi789"
+        timestamp:
+          type: string
+          format: date-time
+        count:
+          type: integer
+          example: 10
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "ValidationError"
+        message:
+          type: string
+          example: "Invalid country code"
+        requestId:
+          type: string
+          example: "abc123-def456-ghi789"
+        timestamp:
+          type: string
+          format: date-time
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Unauthorized:
+      description: Missing or invalid API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    TooManyRequests:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+      headers:
+        X-RateLimit-Limit:
+          description: Request limit per hour
+          schema:
+            type: integer
+        X-RateLimit-Remaining:
+          description: Remaining requests in current window
+          schema:
+            type: integer
+        X-RateLimit-Reset:
+          description: Time when the rate limit resets
+          schema:
+            type: string
+            format: date-time
+
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+tags:
+  - name: Holidays
+    description: Holiday data endpoints
+  - name: Business Days
+    description: Business day calculations
+  - name: Timezones
+    description: Timezone information
+  - name: System
+    description: System and health endpoints

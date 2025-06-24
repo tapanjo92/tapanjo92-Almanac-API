@@ -22,6 +22,9 @@ export interface AlmanacConfig {
     logRetentionDays: number;
     enableXRay: boolean;
   };
+  security?: {
+    enableWAF: boolean;
+  };
   tags: {
     [key: string]: string;
   };
@@ -53,6 +56,9 @@ export function getConfig(environment: string): AlmanacConfig {
     monitoring: {
       logRetentionDays: environment === 'prod' ? 90 : 30,
       enableXRay: true,
+    },
+    security: {
+      enableWAF: environment === 'prod',
     },
     tags: {
       Project: projectName,

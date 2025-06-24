@@ -21,15 +21,11 @@ export class Phase1Stack extends cdk.Stack {
   public readonly holidaysFunction: lambdaNodejs.NodejsFunction;
   public readonly businessDaysFunction: lambdaNodejs.NodejsFunction;
   public readonly timezoneFunction: lambdaNodejs.NodejsFunction;
-  public readonly lambdaLayer: lambda.LayerVersion;
 
   constructor(scope: Construct, id: string, props: Phase1StackProps) {
     super(scope, id, props);
 
     const { config, phase0Stack } = props;
-
-    // Create Lambda Layer for shared dependencies
-    this.lambdaLayer = this.createLambdaLayer(config);
 
     // Create Lambda Functions
     this.holidaysFunction = this.createHolidaysFunction(config, phase0Stack);
@@ -49,14 +45,6 @@ export class Phase1Stack extends cdk.Stack {
     this.createOutputs(config);
   }
 
-  private createLambdaLayer(config: AlmanacConfig): lambda.LayerVersion {
-    return new lambda.LayerVersion(this, 'SharedDependenciesLayer', {
-      code: lambda.Code.fromAsset('layers/shared-deps'),
-      compatibleRuntimes: [lambda.Runtime.NODEJS_20_X],
-      description: 'Shared dependencies for Almanac API Lambda functions',
-      layerVersionName: `${config.projectName}-${config.environment}-shared-deps`,
-    });
-  }
 
   private createHolidaysFunction(config: AlmanacConfig, phase0Stack: Phase0Stack): lambdaNodejs.NodejsFunction {
     const func = new lambdaNodejs.NodejsFunction(this, 'HolidaysFunction', {
@@ -73,13 +61,16 @@ export class Phase1Stack extends cdk.Stack {
         REGION: this.region,
         LOG_LEVEL: config.environment === 'prod' ? 'info' : 'debug',
       },
-      layers: [this.lambdaLayer],
       tracing: lambda.Tracing.ACTIVE,
       logRetention: logs.RetentionDays.ONE_MONTH,
       bundling: {
         minify: config.environment === 'prod',
         sourceMap: true,
-        externalModules: ['@aws-sdk/*'], // SDK v3 is included in Lambda runtime
+        externalModules: [
+          '@aws-sdk/client-dynamodb',
+          '@aws-sdk/lib-dynamodb',
+          '@aws-sdk/client-cognito-identity-provider'
+        ],
       },
     });
 
@@ -109,13 +100,16 @@ export class Phase1Stack extends cdk.Stack {
         REGION: this.region,
         LOG_LEVEL: config.environment === 'prod' ? 'info' : 'debug',
       },
-      layers: [this.lambdaLayer],
       tracing: lambda.Tracing.ACTIVE,
       logRetention: logs.RetentionDays.ONE_MONTH,
       bundling: {
         minify: config.environment === 'prod',
         sourceMap: true,
-        externalModules: ['@aws-sdk/*'],
+        externalModules: [
+          '@aws-sdk/client-dynamodb',
+          '@aws-sdk/lib-dynamodb',
+          '@aws-sdk/client-cognito-identity-provider'
+        ],
       },
     });
 
@@ -146,13 +140,16 @@ export class Phase1Stack extends cdk.Stack {
         LOG_LEVEL: config.environment === 'prod' ? 'info' : 'debug',
         USE_FALLBACK_API: 'true', // Feature flag for external API fallback
       },
-      layers: [this.lambdaLayer],
       tracing: lambda.Tracing.ACTIVE,
       logRetention: logs.RetentionDays.ONE_MONTH,
       bundling: {
         minify: config.environment === 'prod',
         sourceMap: true,
-        externalModules: ['@aws-sdk/*'],
+        externalModules: [
+          '@aws-sdk/client-dynamodb',
+          '@aws-sdk/lib-dynamodb',
+          '@aws-sdk/client-cognito-identity-provider'
+        ],
       },
     });
 
