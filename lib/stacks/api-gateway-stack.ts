@@ -7,10 +7,12 @@ import * as waf from 'aws-cdk-lib/aws-wafv2';
 import { Construct } from 'constructs';
 import { AlmanacConfig } from '../config';
 import { Phase1Stack } from './phase1-stack';
+import { CognitoStack } from './cognito-stack';
 
 export interface ApiGatewayStackProps extends cdk.StackProps {
   config: AlmanacConfig;
   phase1Stack: Phase1Stack;
+  cognitoStack?: CognitoStack;
 }
 
 export class ApiGatewayStack extends cdk.Stack {
@@ -21,7 +23,7 @@ export class ApiGatewayStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: ApiGatewayStackProps) {
     super(scope, id, props);
 
-    const { config, phase1Stack } = props;
+    const { config, phase1Stack, cognitoStack } = props;
 
     // Create REST API
     this.api = new apigateway.RestApi(this, 'AlmanacAPI', {
@@ -100,6 +102,10 @@ export class ApiGatewayStack extends cdk.Stack {
     // Associate API Key with Usage Plan
     this.usagePlan.addApiKey(this.apiKey);
 
+    // Note: Authorizer will be added in a future phase to avoid circular dependencies
+    // For now, we'll use API key authentication only
+    const authorizer = undefined;
+
     // Create request validator
     const requestValidator = new apigateway.RequestValidator(this, 'RequestValidator', {
       restApi: this.api,
@@ -126,15 +132,15 @@ export class ApiGatewayStack extends cdk.Stack {
 
     // Add holidays endpoint
     const holidays = this.api.root.addResource('holidays');
-    this.addHolidaysEndpoint(holidays, phase1Stack.holidaysFunction, requestValidator);
+    this.addHolidaysEndpoint(holidays, phase1Stack.holidaysFunction, requestValidator, authorizer);
 
     // Add business-days endpoint
     const businessDays = this.api.root.addResource('business-days');
-    this.addBusinessDaysEndpoint(businessDays, phase1Stack.businessDaysFunction, requestValidator);
+    this.addBusinessDaysEndpoint(businessDays, phase1Stack.businessDaysFunction, requestValidator, authorizer);
 
     // Add timezones endpoint
     const timezones = this.api.root.addResource('timezones');
-    this.addTimezonesEndpoint(timezones, phase1Stack.timezoneFunction, requestValidator);
+    this.addTimezonesEndpoint(timezones, phase1Stack.timezoneFunction, requestValidator, authorizer);
 
     // Create CloudWatch dashboard
     this.createDashboard(config);
@@ -176,10 +182,13 @@ export class ApiGatewayStack extends cdk.Stack {
   private addHolidaysEndpoint(
     resource: apigateway.Resource,
     lambdaFunction: lambda.Function,
-    validator: apigateway.RequestValidator
+    validator: apigateway.RequestValidator,
+    authorizer?: apigateway.TokenAuthorizer
   ): void {
     resource.addMethod('GET', new apigateway.LambdaIntegration(lambdaFunction), {
       apiKeyRequired: true,
+      authorizer: authorizer,
+      authorizationType: authorizer ? apigateway.AuthorizationType.CUSTOM : apigateway.AuthorizationType.NONE,
       requestValidator: validator,
       requestParameters: {
         'method.request.querystring.country': true,
@@ -205,7 +214,8 @@ export class ApiGatewayStack extends cdk.Stack {
   private addBusinessDaysEndpoint(
     resource: apigateway.Resource,
     lambdaFunction: lambda.Function,
-    validator: apigateway.RequestValidator
+    validator: apigateway.RequestValidator,
+    authorizer?: apigateway.TokenAuthorizer
   ): void {
     // Create request model for business days calculation
     const businessDaysModel = new apigateway.Model(this, 'BusinessDaysModel', {
@@ -235,6 +245,8 @@ export class ApiGatewayStack extends cdk.Stack {
 
     resource.addMethod('POST', new apigateway.LambdaIntegration(lambdaFunction), {
       apiKeyRequired: true,
+      authorizer: authorizer,
+      authorizationType: authorizer ? apigateway.AuthorizationType.CUSTOM : apigateway.AuthorizationType.NONE,
       requestValidator: bodyValidator,
       requestModels: {
         'application/json': businessDaysModel,
@@ -257,10 +269,13 @@ export class ApiGatewayStack extends cdk.Stack {
   private addTimezonesEndpoint(
     resource: apigateway.Resource,
     lambdaFunction: lambda.Function,
-    validator: apigateway.RequestValidator
+    validator: apigateway.RequestValidator,
+    authorizer?: apigateway.TokenAuthorizer
   ): void {
     resource.addMethod('GET', new apigateway.LambdaIntegration(lambdaFunction), {
       apiKeyRequired: true,
+      authorizer: authorizer,
+      authorizationType: authorizer ? apigateway.AuthorizationType.CUSTOM : apigateway.AuthorizationType.NONE,
       requestValidator: validator,
       requestParameters: {
         'method.request.querystring.lat': true,

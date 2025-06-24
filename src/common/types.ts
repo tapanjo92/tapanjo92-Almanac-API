@@ -49,6 +49,7 @@ export interface HolidayRecord {
   is_weekend: boolean;
   is_fixed: boolean;
   counties?: string[];
+  regions?: string[];
 }
 
 export interface TimezoneRecord {

@@ -410,6 +410,8 @@ function calculateOverallScore(metrics) {
     phase0Stack.stagingBucket.grantReadWrite(jobRole);
     phase0Stack.validatedBucket.grantWrite(jobRole);
     phase0Stack.holidaysTable.grantWriteData(jobRole);
+    // Grant permission to read Glue scripts
+    phase0Stack.glueScriptsBucket.grantRead(jobRole);
 
     return new glue.CfnJob(this, 'HolidayETLJob', {
       name: `${config.projectName}-${config.environment}-holiday-etl`,
@@ -452,6 +454,8 @@ function calculateOverallScore(metrics) {
     phase0Stack.stagingBucket.grantReadWrite(jobRole);
     phase0Stack.validatedBucket.grantWrite(jobRole);
     phase0Stack.timezonesTable.grantWriteData(jobRole);
+    // Grant permission to read Glue scripts
+    phase0Stack.glueScriptsBucket.grantRead(jobRole);
 
     return new glue.CfnJob(this, 'TimezoneETLJob', {
       name: `${config.projectName}-${config.environment}-timezone-etl`,

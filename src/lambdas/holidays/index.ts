@@ -25,6 +25,7 @@ interface HolidayQueryParams {
   year: string;
   month?: string;
   type?: 'public' | 'bank' | 'observance';
+  region?: string;
 }
 
 export const handler = async (
@@ -60,8 +61,10 @@ export const handler = async (
     
     subsegment?.close();
     
-    // No region filtering needed for current implementation
-    const filteredHolidays = holidays;
+    // Filter by region if specified
+    const filteredHolidays = params.region 
+      ? filterHolidaysByRegion(holidays, params.region)
+      : holidays;
     
     const responseTime = Date.now() - startTime;
     const responseBody = JSON.stringify({
@@ -149,20 +152,24 @@ function validateQueryParams(params: any): HolidayQueryParams {
     throw new ValidationError('Month must be between 1 and 12');
   }
 
+  // Validate region if provided
+  const region = params.region ? validateRegion(params.region, country) : undefined;
+
   return {
     country,
     year: year.toString(),
     month: month?.toString(),
     type: params.type,
+    region,
   };
 }
 
 async function queryHolidays(params: HolidayQueryParams): Promise<Holiday[]> {
-  const queryParams = {
+  const queryParams: any = {
     KeyConditionExpression: 'PK = :pk',
     ExpressionAttributeValues: {
       ':pk': `COUNTRY#${params.country}`,
-    } as any,
+    },
     ScanIndexForward: true, // Sort by date ascending
   };
 
@@ -197,6 +204,35 @@ async function queryHolidays(params: HolidayQueryParams): Promise<Holiday[]> {
     is_weekend: item.is_weekend,
     is_fixed: item.is_fixed,
     counties: item.counties,
+    regions: item.regions,
   }));
+}
+
+function validateRegion(region: string, country: string): string {
+  const upperRegion = region.toUpperCase();
+  
+  // Australian state/territory codes
+  const australianRegions = ['NSW', 'VIC', 'QLD', 'WA', 'SA', 'TAS', 'ACT', 'NT'];
+  
+  if (country === 'AU') {
+    if (!australianRegions.includes(upperRegion)) {
+      throw new ValidationError(`Invalid region '${region}' for Australia. Valid regions: ${australianRegions.join(', ')}`);
+    }
+  }
+  
+  // Add validation for other countries as needed
+  // For now, just return the uppercase region
+  return upperRegion;
+}
+
+function filterHolidaysByRegion(holidays: Holiday[], region: string): Holiday[] {
+  return holidays.filter(holiday => {
+    // If no regions specified or regions include 'ALL', it applies to all regions
+    if (!holiday.regions || holiday.regions.includes('ALL')) {
+      return true;
+    }
+    // Otherwise, check if the holiday applies to the specified region
+    return holiday.regions.includes(region);
+  });
 }
 
