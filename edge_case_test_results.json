@@ -1,0 +1,2115 @@
+{
+  "timestamp": "2025-06-24T11:24:37.537979",
+  "api_url": "https://fkbmscbv0f.execute-api.ap-south-1.amazonaws.com/v1",
+  "total_tests": 96,
+  "results": [
+    {
+      "test_name": "Invalid date format - text",
+      "endpoint": "holidays",
+      "params": {
+        "country": "AU",
+        "year": "twenty-twenty-four"
+      },
+      "status_code": 200,
+      "expected_status": 400,
+      "passed": false,
+      "response": "{\"country\":\"AU\",\"year\":\"NaN\",\"holidays\":[],\"count\":0}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:26 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "53",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "12d40514-d6ef-47ec-814a-5df6040d47c6",
+        "X-Response-Time": "279ms",
+        "x-amz-apigw-id": "MqqkuFonhcwEa4w=",
+        "Cache-Control": "public, max-age=3600",
+        "X-Amzn-Trace-Id": "Root=1-685a8aea-34a5a058057b4d11504ec79d"
+      }
+    },
+    {
+      "test_name": "Invalid date format - negative",
+      "endpoint": "holidays",
+      "params": {
+        "country": "AU",
+        "year": "-2024"
+      },
+      "status_code": 400,
+      "expected_status": 400,
+      "passed": true,
+      "response": "{\"error\":\"Year must be between 2015 and 2035\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:26 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "46",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "9754aa84-3da3-4f82-a9ff-025624560147",
+        "X-Response-Time": "1ms",
+        "x-amz-apigw-id": "MqqkxEfKhcwEJMg=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aea-53a0b6262fcb2e2f73db884e"
+      }
+    },
+    {
+      "test_name": "Invalid date format - float",
+      "endpoint": "holidays",
+      "params": {
+        "country": "AU",
+        "year": "2024.5"
+      },
+      "status_code": 200,
+      "expected_status": 400,
+      "passed": false,
+      "response": "{\"country\":\"AU\",\"year\":\"2024\",\"holidays\":[{\"date\":\"2024-01-01\",\"name\":\"New Year's Day\",\"type\":\"public\",\"country\":\"AU\",\"country_name\":\"Australia\",\"year\":2024,\"month\":1,\"day\":1,\"day_of_week\":\"Monday\",\"is_weekend\":false,\"is_fixed\":true,\"regions\":[\"ALL\"]},{\"date\":\"2024-01-26\",\"name\":\"Australia Day\",\"type\":\"public\",\"country\":\"AU\",\"country_name\":\"Australia\",\"year\":2024,\"month\":1,\"day\":26,\"day_of_week\":\"Friday\",\"is_weekend\":false,\"is_fixed\":true,\"regions\":[\"ALL\"]},{\"date\":\"2024-03-04\",\"name\":\"Labour Da",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:27 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "4598",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "17d0e782-995b-4c87-ad5b-1a3db1e96475",
+        "X-Response-Time": "12ms",
+        "x-amz-apigw-id": "MqqkyEfUBcwEJMg=",
+        "Cache-Control": "public, max-age=3600",
+        "X-Amzn-Trace-Id": "Root=1-685a8aeb-32b600986d30099f0c6db4fa"
+      }
+    },
+    {
+      "test_name": "Invalid date format - too many digits",
+      "endpoint": "holidays",
+      "params": {
+        "country": "AU",
+        "year": "20240"
+      },
+      "status_code": 400,
+      "expected_status": 400,
+      "passed": true,
+      "response": "{\"error\":\"Year must be between 2015 and 2035\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:27 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "46",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "c866c47d-1e7e-4bef-a0db-c669ed8c2f0b",
+        "X-Response-Time": "1ms",
+        "x-amz-apigw-id": "MqqkyEXWhcwEc0A=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aeb-1e422ccd52e8c4703b78c789"
+      }
+    },
+    {
+      "test_name": "Numeric country code",
+      "endpoint": "holidays",
+      "params": {
+        "country": "123",
+        "year": "2024"
+      },
+      "status_code": 400,
+      "expected_status": 400,
+      "passed": true,
+      "response": "{\"error\":\"Invalid country code: 123. Supported countries: AU, UK, GB, DE, US, CA, NZ, FR, IT, ES\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:27 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "98",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "15e3b064-afb1-4b4b-9429-d1c7089dda17",
+        "X-Response-Time": "1ms",
+        "x-amz-apigw-id": "MqqkzGddhcwEGSw=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aeb-08e4e64372c6cc9551a3b069"
+      }
+    },
+    {
+      "test_name": "Special chars country code",
+      "endpoint": "holidays",
+      "params": {
+        "country": "@#$",
+        "year": "2024"
+      },
+      "status_code": 400,
+      "expected_status": 400,
+      "passed": true,
+      "response": "{\"error\":\"Invalid country code: @#$. Supported countries: AU, UK, GB, DE, US, CA, NZ, FR, IT, ES\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:27 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "98",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "4391b473-4cec-4458-990c-39f4be76dff6",
+        "X-Response-Time": "1ms",
+        "x-amz-apigw-id": "Mqqk0HDvhcwEc2w=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aeb-6e41f4bf5659a56b32a5b055"
+      }
+    },
+    {
+      "test_name": "Empty country code",
+      "endpoint": "holidays",
+      "params": {
+        "country": "",
+        "year": "2024"
+      },
+      "status_code": 400,
+      "expected_status": 400,
+      "passed": true,
+      "response": "{\"message\": \"Missing required request parameters: [country]\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:27 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "61",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "b8f5e46e-7ac5-48ba-a3c9-dad617cb083d",
+        "x-amzn-ErrorType": "BadRequestException",
+        "x-amz-apigw-id": "Mqqk0EaQhcwEIqA=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aeb-779662031a9bf65645cb26b3"
+      }
+    },
+    {
+      "test_name": "Very long country code",
+      "endpoint": "holidays",
+      "params": {
+        "country": "ABCDEFGHIJKLMNOP",
+        "year": "2024"
+      },
+      "status_code": 400,
+      "expected_status": 400,
+      "passed": true,
+      "response": "{\"error\":\"Invalid country code: ABCDEFGHIJKLMNOP. Supported countries: AU, UK, GB, DE, US, CA, NZ, FR, IT, ES\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:27 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "111",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "d8d17870-2d55-47f5-9da0-3fb639a754b5",
+        "X-Response-Time": "0ms",
+        "x-amz-apigw-id": "Mqqk0G6xBcwEJNw=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aeb-5cc58ff45252a185205756db"
+      }
+    },
+    {
+      "test_name": "SQL injection attempt",
+      "endpoint": "holidays",
+      "params": {
+        "country": "AU'; DROP TABLE holidays; --",
+        "year": "2024"
+      },
+      "status_code": 400,
+      "expected_status": 400,
+      "passed": true,
+      "response": "{\"error\":\"Invalid country code: AU'; DROP TABLE holidays; --. Supported countries: AU, UK, GB, DE, US, CA, NZ, FR, IT, ES\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:27 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "123",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "be57c29b-a2dc-4766-80ee-67347910d768",
+        "X-Response-Time": "1ms",
+        "x-amz-apigw-id": "Mqqk1GM0BcwEOGw=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aeb-042981c65fb4988e319e62d1"
+      }
+    },
+    {
+      "test_name": "Mixed case country",
+      "endpoint": "holidays",
+      "params": {
+        "country": "au",
+        "year": "2024"
+      },
+      "status_code": 200,
+      "expected_status": 400,
+      "passed": false,
+      "response": "{\"country\":\"AU\",\"year\":\"2024\",\"holidays\":[{\"date\":\"2024-01-01\",\"name\":\"New Year's Day\",\"type\":\"public\",\"country\":\"AU\",\"country_name\":\"Australia\",\"year\":2024,\"month\":1,\"day\":1,\"day_of_week\":\"Monday\",\"is_weekend\":false,\"is_fixed\":true,\"regions\":[\"ALL\"]},{\"date\":\"2024-01-26\",\"name\":\"Australia Day\",\"type\":\"public\",\"country\":\"AU\",\"country_name\":\"Australia\",\"year\":2024,\"month\":1,\"day\":26,\"day_of_week\":\"Friday\",\"is_weekend\":false,\"is_fixed\":true,\"regions\":[\"ALL\"]},{\"date\":\"2024-03-04\",\"name\":\"Labour Da",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:27 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "4598",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "0cac6c7b-ba42-43e5-8eb2-46656dcd31a1",
+        "X-Response-Time": "15ms",
+        "x-amz-apigw-id": "Mqqk1EajhcwEIqA=",
+        "Cache-Control": "public, max-age=3600",
+        "X-Amzn-Trace-Id": "Root=1-685a8aeb-0ad4be505a689c286257dfcf"
+      }
+    },
+    {
+      "test_name": "Far past year",
+      "endpoint": "holidays",
+      "params": {
+        "country": "AU",
+        "year": "1800"
+      },
+      "status_code": 400,
+      "expected_status": 200,
+      "passed": false,
+      "response": "{\"error\":\"Year must be between 2015 and 2035\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:27 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "46",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "953caed4-0f13-4fe7-a894-f985d9919cf2",
+        "X-Response-Time": "1ms",
+        "x-amz-apigw-id": "Mqqk2EQYhcwEb5g=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aeb-692216290265dedc1e12f570"
+      }
+    },
+    {
+      "test_name": "Far future year",
+      "endpoint": "holidays",
+      "params": {
+        "country": "AU",
+        "year": "3000"
+      },
+      "status_code": 400,
+      "expected_status": 200,
+      "passed": false,
+      "response": "{\"error\":\"Year must be between 2015 and 2035\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:27 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "46",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "ead831c7-326f-464e-a8f9-89b541f4b1f7",
+        "X-Response-Time": "1ms",
+        "x-amz-apigw-id": "Mqqk3EVUhcwEOaQ=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aeb-64a03f31308baab42a08a791"
+      }
+    },
+    {
+      "test_name": "Year 0",
+      "endpoint": "holidays",
+      "params": {
+        "country": "AU",
+        "year": "0"
+      },
+      "status_code": 400,
+      "expected_status": 400,
+      "passed": true,
+      "response": "{\"error\":\"Year must be between 2015 and 2035\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:27 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "46",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "ab438c73-3e25-491f-a540-26044c12f526",
+        "X-Response-Time": "1ms",
+        "x-amz-apigw-id": "Mqqk4FlfhcwEC5A=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aeb-3019971e2f552f791105962c"
+      }
+    },
+    {
+      "test_name": "Current year",
+      "endpoint": "holidays",
+      "params": {
+        "country": "AU",
+        "year": "2025"
+      },
+      "status_code": 200,
+      "expected_status": 200,
+      "passed": true,
+      "response": "{\"country\":\"AU\",\"year\":\"2025\",\"holidays\":[{\"date\":\"2025-01-01\",\"name\":\"New Year's Day\",\"type\":\"public\",\"country\":\"AU\",\"country_name\":\"Australia\",\"year\":2025,\"month\":1,\"day\":1,\"day_of_week\":\"Wednesday\",\"is_weekend\":false,\"is_fixed\":true,\"regions\":[\"ALL\"]},{\"date\":\"2025-01-27\",\"name\":\"Australia Day\",\"type\":\"public\",\"country\":\"AU\",\"country_name\":\"Australia\",\"year\":2025,\"month\":1,\"day\":27,\"day_of_week\":\"Monday\",\"is_weekend\":false,\"is_fixed\":true,\"regions\":[\"ALL\"]},{\"date\":\"2025-03-03\",\"name\":\"Labour",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:27 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "4352",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "2539bf8a-ebf2-4c68-b11e-69e1cb9b24fe",
+        "X-Response-Time": "29ms",
+        "x-amz-apigw-id": "Mqqk4FGzBcwETJg=",
+        "Cache-Control": "public, max-age=3600",
+        "X-Amzn-Trace-Id": "Root=1-685a8aeb-04455ce66ec37f002ea26210"
+      }
+    },
+    {
+      "test_name": "Invalid month - 0",
+      "endpoint": "holidays",
+      "params": {
+        "country": "AU",
+        "year": "2024",
+        "month": "0"
+      },
+      "status_code": 200,
+      "expected_status": 400,
+      "passed": false,
+      "response": "{\"country\":\"AU\",\"year\":\"2024\",\"holidays\":[],\"count\":0}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:27 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "54",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "6f3fce6c-f7e8-4d6f-8e8d-7e09ff92d6bd",
+        "X-Response-Time": "16ms",
+        "x-amz-apigw-id": "Mqqk5G_DhcwEWWQ=",
+        "Cache-Control": "public, max-age=3600",
+        "X-Amzn-Trace-Id": "Root=1-685a8aeb-4d387e453149d3b762d9ad75"
+      }
+    },
+    {
+      "test_name": "Invalid month - 13",
+      "endpoint": "holidays",
+      "params": {
+        "country": "AU",
+        "year": "2024",
+        "month": "13"
+      },
+      "status_code": 400,
+      "expected_status": 400,
+      "passed": true,
+      "response": "{\"error\":\"Month must be between 1 and 12\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:27 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "42",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "a147b9ae-1852-4243-be35-c8799b041f12",
+        "X-Response-Time": "0ms",
+        "x-amz-apigw-id": "Mqqk6EUGhcwEX_g=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aeb-5bc2185c0e8494af28edeb9b"
+      }
+    },
+    {
+      "test_name": "Invalid month - negative",
+      "endpoint": "holidays",
+      "params": {
+        "country": "AU",
+        "year": "2024",
+        "month": "-1"
+      },
+      "status_code": 400,
+      "expected_status": 400,
+      "passed": true,
+      "response": "{\"error\":\"Month must be between 1 and 12\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:27 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "42",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "779528dd-352a-477e-9482-7ecf6a876d01",
+        "X-Response-Time": "1ms",
+        "x-amz-apigw-id": "Mqqk6G_ZBcwEWWQ=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aeb-1eddcfb532a013621d94815f"
+      }
+    },
+    {
+      "test_name": "Invalid month - text",
+      "endpoint": "holidays",
+      "params": {
+        "country": "AU",
+        "year": "2024",
+        "month": "January"
+      },
+      "status_code": 200,
+      "expected_status": 400,
+      "passed": false,
+      "response": "{\"country\":\"AU\",\"year\":\"2024\",\"holidays\":[],\"count\":0}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:27 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "54",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "9fdf4a88-c8e8-46f4-acb1-5321dfdd4006",
+        "X-Response-Time": "24ms",
+        "x-amz-apigw-id": "Mqqk7EcXhcwEAFg=",
+        "Cache-Control": "public, max-age=3600",
+        "X-Amzn-Trace-Id": "Root=1-685a8aeb-2a7c865d7955a99c292169d1"
+      }
+    },
+    {
+      "test_name": "Missing country",
+      "endpoint": "holidays",
+      "params": {
+        "year": "2024"
+      },
+      "status_code": 400,
+      "expected_status": 400,
+      "passed": true,
+      "response": "{\"message\": \"Missing required request parameters: [country]\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:28 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "61",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "a5b7bb16-2394-48a4-b239-5c7052d08e82",
+        "x-amzn-ErrorType": "BadRequestException",
+        "x-amz-apigw-id": "Mqqk8GkHhcwEJZw=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aec-022e27685afea0ba59766aa7"
+      }
+    },
+    {
+      "test_name": "Missing year",
+      "endpoint": "holidays",
+      "params": {
+        "country": "AU"
+      },
+      "status_code": 400,
+      "expected_status": 400,
+      "passed": true,
+      "response": "{\"message\": \"Missing required request parameters: [year]\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:28 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "58",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "08f140c3-7a6b-40c6-972a-2ae2f4efcf5e",
+        "x-amzn-ErrorType": "BadRequestException",
+        "x-amz-apigw-id": "Mqqk8Hd2BcwEa8Q=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aec-6513c52e516fa6b4523ffb49"
+      }
+    },
+    {
+      "test_name": "Extra unknown parameter",
+      "endpoint": "holidays",
+      "params": {
+        "country": "AU",
+        "year": "2024",
+        "unknown": "value"
+      },
+      "status_code": 200,
+      "expected_status": 200,
+      "passed": true,
+      "response": "{\"country\":\"AU\",\"year\":\"2024\",\"holidays\":[{\"date\":\"2024-01-01\",\"name\":\"New Year's Day\",\"type\":\"public\",\"country\":\"AU\",\"country_name\":\"Australia\",\"year\":2024,\"month\":1,\"day\":1,\"day_of_week\":\"Monday\",\"is_weekend\":false,\"is_fixed\":true,\"regions\":[\"ALL\"]},{\"date\":\"2024-01-26\",\"name\":\"Australia Day\",\"type\":\"public\",\"country\":\"AU\",\"country_name\":\"Australia\",\"year\":2024,\"month\":1,\"day\":26,\"day_of_week\":\"Friday\",\"is_weekend\":false,\"is_fixed\":true,\"regions\":[\"ALL\"]},{\"date\":\"2024-03-04\",\"name\":\"Labour Da",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:28 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "4598",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "07c200ad-7d55-4f37-b034-fe875b1daf04",
+        "X-Response-Time": "14ms",
+        "x-amz-apigw-id": "Mqqk8GfrBcwEGSw=",
+        "Cache-Control": "public, max-age=3600",
+        "X-Amzn-Trace-Id": "Root=1-685a8aec-6d894b563a43d7972997f666"
+      }
+    },
+    {
+      "test_name": "All parameters missing",
+      "endpoint": "holidays",
+      "params": {},
+      "status_code": 400,
+      "expected_status": 400,
+      "passed": true,
+      "response": "{\"message\": \"Missing required request parameters: [country, year]\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:28 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "67",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "8385350c-86f6-46c4-befa-a8f898adc7da",
+        "x-amzn-ErrorType": "BadRequestException",
+        "x-amz-apigw-id": "Mqqk9H_7BcwEWRw=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aec-7297cf1f704dd6ae24a3f1bb"
+      }
+    },
+    {
+      "test_name": "Invalid type",
+      "endpoint": "holidays",
+      "params": {
+        "country": "AU",
+        "year": "2024",
+        "type": "invalid"
+      },
+      "status_code": 200,
+      "expected_status": 400,
+      "passed": false,
+      "response": "{\"country\":\"AU\",\"year\":\"2024\",\"holidays\":[],\"count\":0}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:28 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "54",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "81050de9-9282-4dd1-9b9c-36c1207be476",
+        "X-Response-Time": "11ms",
+        "x-amz-apigw-id": "Mqqk9GbUBcwEEIw=",
+        "Cache-Control": "public, max-age=3600",
+        "X-Amzn-Trace-Id": "Root=1-685a8aec-3641172e3003756506f03491"
+      }
+    },
+    {
+      "test_name": "Valid type - public",
+      "endpoint": "holidays",
+      "params": {
+        "country": "AU",
+        "year": "2024",
+        "type": "public"
+      },
+      "status_code": 200,
+      "expected_status": 200,
+      "passed": true,
+      "response": "{\"country\":\"AU\",\"year\":\"2024\",\"holidays\":[{\"date\":\"2024-01-01\",\"name\":\"New Year's Day\",\"type\":\"public\",\"country\":\"AU\",\"country_name\":\"Australia\",\"year\":2024,\"month\":1,\"day\":1,\"day_of_week\":\"Monday\",\"is_weekend\":false,\"is_fixed\":true,\"regions\":[\"ALL\"]},{\"date\":\"2024-01-26\",\"name\":\"Australia Day\",\"type\":\"public\",\"country\":\"AU\",\"country_name\":\"Australia\",\"year\":2024,\"month\":1,\"day\":26,\"day_of_week\":\"Friday\",\"is_weekend\":false,\"is_fixed\":true,\"regions\":[\"ALL\"]},{\"date\":\"2024-03-04\",\"name\":\"Labour Da",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:28 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "4598",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "d7016fd3-711a-46aa-a136-b0d7543c9b07",
+        "X-Response-Time": "13ms",
+        "x-amz-apigw-id": "Mqqk-ERfBcwEBRQ=",
+        "Cache-Control": "public, max-age=3600",
+        "X-Amzn-Trace-Id": "Root=1-685a8aec-136c884e640cab1f54ab01e9"
+      }
+    },
+    {
+      "test_name": "Valid type - bank",
+      "endpoint": "holidays",
+      "params": {
+        "country": "AU",
+        "year": "2024",
+        "type": "bank"
+      },
+      "status_code": 200,
+      "expected_status": 200,
+      "passed": true,
+      "response": "{\"country\":\"AU\",\"year\":\"2024\",\"holidays\":[],\"count\":0}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:28 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "54",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "3ffc7d17-9ffc-4a9e-8e44-77e27b56a861",
+        "X-Response-Time": "24ms",
+        "x-amz-apigw-id": "Mqqk_EPIBcwEAZA=",
+        "Cache-Control": "public, max-age=3600",
+        "X-Amzn-Trace-Id": "Root=1-685a8aec-635356525ee48c432cfaf484"
+      }
+    },
+    {
+      "test_name": "Very long parameter value",
+      "endpoint": "holidays",
+      "params": {
+        "country": "AU",
+        "year": "2024",
+        "extra": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      },
+      "status_code": 200,
+      "expected_status": 200,
+      "passed": true,
+      "response": "{\"country\":\"AU\",\"year\":\"2024\",\"holidays\":[{\"date\":\"2024-01-01\",\"name\":\"New Year's Day\",\"type\":\"public\",\"country\":\"AU\",\"country_name\":\"Australia\",\"year\":2024,\"month\":1,\"day\":1,\"day_of_week\":\"Monday\",\"is_weekend\":false,\"is_fixed\":true,\"regions\":[\"ALL\"]},{\"date\":\"2024-01-26\",\"name\":\"Australia Day\",\"type\":\"public\",\"country\":\"AU\",\"country_name\":\"Australia\",\"year\":2024,\"month\":1,\"day\":26,\"day_of_week\":\"Friday\",\"is_weekend\":false,\"is_fixed\":true,\"regions\":[\"ALL\"]},{\"date\":\"2024-03-04\",\"name\":\"Labour Da",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:28 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "4598",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "d43c35fb-7d70-49af-9c18-72712e82480d",
+        "X-Response-Time": "21ms",
+        "x-amz-apigw-id": "Mqqk_GAFhcwEY7A=",
+        "Cache-Control": "public, max-age=3600",
+        "X-Amzn-Trace-Id": "Root=1-685a8aec-124341a968f0fd485117b16f"
+      }
+    },
+    {
+      "test_name": "Invalid start date format",
+      "endpoint": "business-days",
+      "params": {
+        "startDate": "2024/01/01",
+        "endDate": "2024-01-31",
+        "country": "AU"
+      },
+      "status_code": 500,
+      "expected_status": 400,
+      "passed": false,
+      "response": "{\"message\": \"Internal server error\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:28 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "36",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "0c6742e1-ae6a-4fbb-9901-332cebf1c763",
+        "x-amzn-ErrorType": "InternalServerErrorException",
+        "x-amz-apigw-id": "MqqlAG4ahcwEdVw=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aec-3812c71c5136a1397c161590"
+      }
+    },
+    {
+      "test_name": "Invalid end date format",
+      "endpoint": "business-days",
+      "params": {
+        "startDate": "2024-01-01",
+        "endDate": "31-01-2024",
+        "country": "AU"
+      },
+      "status_code": 500,
+      "expected_status": 400,
+      "passed": false,
+      "response": "{\"message\": \"Internal server error\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:28 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "36",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "2f13d815-650d-43ae-a6d5-fe0d7b8ca687",
+        "x-amzn-ErrorType": "InternalServerErrorException",
+        "x-amz-apigw-id": "MqqlBGPqhcwEOGw=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aec-4ae950ae7f9f88a63992a2a8"
+      }
+    },
+    {
+      "test_name": "Text dates",
+      "endpoint": "business-days",
+      "params": {
+        "startDate": "first of january",
+        "endDate": "last of january",
+        "country": "AU"
+      },
+      "status_code": 500,
+      "expected_status": 400,
+      "passed": false,
+      "response": "{\"message\": \"Internal server error\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:28 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "36",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "9a548a4b-6934-4cda-bc78-17e95c6ecd26",
+        "x-amzn-ErrorType": "InternalServerErrorException",
+        "x-amz-apigw-id": "MqqlBEvrBcwEc5Q=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aec-45d72c2402249fd7502ad527"
+      }
+    },
+    {
+      "test_name": "Incomplete dates",
+      "endpoint": "business-days",
+      "params": {
+        "startDate": "2024-01",
+        "endDate": "2024-02",
+        "country": "AU"
+      },
+      "status_code": 500,
+      "expected_status": 400,
+      "passed": false,
+      "response": "{\"message\": \"Internal server error\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:28 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "36",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "aff52d26-3bbb-450e-9980-bc33eed61eb0",
+        "x-amzn-ErrorType": "InternalServerErrorException",
+        "x-amz-apigw-id": "MqqlCEWThcwEX_g=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aec-57505fae4ff0414553f5e3f7"
+      }
+    },
+    {
+      "test_name": "End before start",
+      "endpoint": "business-days",
+      "params": {
+        "startDate": "2024-01-31",
+        "endDate": "2024-01-01",
+        "country": "AU"
+      },
+      "status_code": 500,
+      "expected_status": 400,
+      "passed": false,
+      "response": "{\"message\": \"Internal server error\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:28 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "36",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "903ae5e0-7524-45cb-8f16-899a02b48c0c",
+        "x-amzn-ErrorType": "InternalServerErrorException",
+        "x-amz-apigw-id": "MqqlCGYpBcwEOxQ=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aec-626af1c34a8ae7083b3ff52c"
+      }
+    },
+    {
+      "test_name": "Same date",
+      "endpoint": "business-days",
+      "params": {
+        "startDate": "2024-01-01",
+        "endDate": "2024-01-01",
+        "country": "AU"
+      },
+      "status_code": 500,
+      "expected_status": 200,
+      "passed": false,
+      "response": "{\"message\": \"Internal server error\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:28 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "36",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "58262acc-29ba-4c44-9e97-6111de2d8950",
+        "x-amzn-ErrorType": "InternalServerErrorException",
+        "x-amz-apigw-id": "MqqlCFsJBcwEJ0Q=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aec-01d3fb0e1947c1d2077d0295"
+      }
+    },
+    {
+      "test_name": "Very large date range",
+      "endpoint": "business-days",
+      "params": {
+        "startDate": "2024-01-01",
+        "endDate": "2034-12-31",
+        "country": "AU"
+      },
+      "status_code": 500,
+      "expected_status": 200,
+      "passed": false,
+      "response": "{\"message\": \"Internal server error\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:28 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "36",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "9a133cfb-f4be-407d-ac33-45b5935cf847",
+        "x-amzn-ErrorType": "InternalServerErrorException",
+        "x-amz-apigw-id": "MqqlDHpxBcwEDgw=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aec-664521b7313e97b67d9e5edb"
+      }
+    },
+    {
+      "test_name": "Century span",
+      "endpoint": "business-days",
+      "params": {
+        "startDate": "1924-01-01",
+        "endDate": "2024-12-31",
+        "country": "AU"
+      },
+      "status_code": 500,
+      "expected_status": 200,
+      "passed": false,
+      "response": "{\"message\": \"Internal server error\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:28 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "36",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "93fa50e2-1a09-4b33-a024-f456bc5d49c8",
+        "x-amzn-ErrorType": "InternalServerErrorException",
+        "x-amz-apigw-id": "MqqlDHlDhcwEHgw=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aec-3119cbd172291c0e758b1204"
+      }
+    },
+    {
+      "test_name": "Leap year Feb 29",
+      "endpoint": "business-days",
+      "params": {
+        "startDate": "2024-02-28",
+        "endDate": "2024-03-01",
+        "country": "AU"
+      },
+      "status_code": 500,
+      "expected_status": 200,
+      "passed": false,
+      "response": "{\"message\": \"Internal server error\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:28 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "36",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "7669ed4f-444b-4e1c-a2d7-e6aeaa81b69c",
+        "x-amzn-ErrorType": "InternalServerErrorException",
+        "x-amz-apigw-id": "MqqlEElThcwEZpA=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aec-1bf54cd929f77e36431f6e1a"
+      }
+    },
+    {
+      "test_name": "Non-leap year Feb 29",
+      "endpoint": "business-days",
+      "params": {
+        "startDate": "2023-02-28",
+        "endDate": "2023-03-01",
+        "country": "AU"
+      },
+      "status_code": 500,
+      "expected_status": 200,
+      "passed": false,
+      "response": "{\"message\": \"Internal server error\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:28 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "36",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "d831e38e-27ff-4432-b670-f1df401e7a68",
+        "x-amzn-ErrorType": "InternalServerErrorException",
+        "x-amz-apigw-id": "MqqlEFi0BcwEV3w=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aec-214e3af607bbb97803510f31"
+      }
+    },
+    {
+      "test_name": "Year boundary",
+      "endpoint": "business-days",
+      "params": {
+        "startDate": "2023-12-30",
+        "endDate": "2024-01-02",
+        "country": "AU"
+      },
+      "status_code": 500,
+      "expected_status": 200,
+      "passed": false,
+      "response": "{\"message\": \"Internal server error\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:28 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "36",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "18b170b3-e6bb-4d62-bb0e-124885ef60e0",
+        "x-amzn-ErrorType": "InternalServerErrorException",
+        "x-amz-apigw-id": "MqqlFEkMBcwEbrA=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aec-7b119e127e7bafb8299e2dd9"
+      }
+    },
+    {
+      "test_name": "Numeric country",
+      "endpoint": "business-days",
+      "params": {
+        "startDate": "2024-01-01",
+        "endDate": "2024-01-31",
+        "country": "999"
+      },
+      "status_code": 500,
+      "expected_status": 400,
+      "passed": false,
+      "response": "{\"message\": \"Internal server error\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:28 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "36",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "f5652050-4759-4e09-933c-6958ee107eff",
+        "x-amzn-ErrorType": "InternalServerErrorException",
+        "x-amz-apigw-id": "MqqlFGX-BcwESFQ=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aec-68cb1dad52221d644d8214f7"
+      }
+    },
+    {
+      "test_name": "Special chars",
+      "endpoint": "business-days",
+      "params": {
+        "startDate": "2024-01-01",
+        "endDate": "2024-01-31",
+        "country": "!@#"
+      },
+      "status_code": 500,
+      "expected_status": 400,
+      "passed": false,
+      "response": "{\"message\": \"Internal server error\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:29 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "36",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "da83eea2-9c95-472d-aef2-d65c66b4e404",
+        "x-amzn-ErrorType": "InternalServerErrorException",
+        "x-amz-apigw-id": "MqqlFEYtBcwEOaQ=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aec-2f4e957e0e70f750614df522"
+      }
+    },
+    {
+      "test_name": "includeWeekends string true",
+      "endpoint": "business-days",
+      "params": {
+        "startDate": "2024-01-01",
+        "endDate": "2024-01-31",
+        "country": "AU",
+        "includeWeekends": "true"
+      },
+      "status_code": 500,
+      "expected_status": 200,
+      "passed": false,
+      "response": "{\"message\": \"Internal server error\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:29 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "36",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "5199de6c-3568-4dc3-9e72-32cb5cf45fcd",
+        "x-amzn-ErrorType": "InternalServerErrorException",
+        "x-amz-apigw-id": "MqqlGH2DBcwEOGA=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aed-18ef5ecc4a3cc92c02761f54"
+      }
+    },
+    {
+      "test_name": "includeWeekends string false",
+      "endpoint": "business-days",
+      "params": {
+        "startDate": "2024-01-01",
+        "endDate": "2024-01-31",
+        "country": "AU",
+        "includeWeekends": "false"
+      },
+      "status_code": 500,
+      "expected_status": 200,
+      "passed": false,
+      "response": "{\"message\": \"Internal server error\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:29 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "36",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "10fb5586-196d-4e9b-90bc-ee5c1dd1be2a",
+        "x-amzn-ErrorType": "InternalServerErrorException",
+        "x-amz-apigw-id": "MqqlGEsiBcwESuA=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aed-19859d533aaf9f504dfbe4d6"
+      }
+    },
+    {
+      "test_name": "includeWeekends invalid",
+      "endpoint": "business-days",
+      "params": {
+        "startDate": "2024-01-01",
+        "endDate": "2024-01-31",
+        "country": "AU",
+        "includeWeekends": "maybe"
+      },
+      "status_code": 500,
+      "expected_status": 400,
+      "passed": false,
+      "response": "{\"message\": \"Internal server error\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:29 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "36",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "33041a73-36e0-4f25-a552-6043faa8b177",
+        "x-amzn-ErrorType": "InternalServerErrorException",
+        "x-amz-apigw-id": "MqqlHFZPBcwEUrw=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aed-7fe4ff723ea5b94427b6dc22"
+      }
+    },
+    {
+      "test_name": "Missing startDate",
+      "endpoint": "business-days",
+      "params": {
+        "endDate": "2024-01-31",
+        "country": "AU"
+      },
+      "status_code": 400,
+      "expected_status": 400,
+      "passed": true,
+      "response": "{\"message\": \"Missing required request parameters: [startDate]\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:29 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "63",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "6652e8c5-7a1a-4175-a9cb-21c65c36404a",
+        "x-amzn-ErrorType": "BadRequestException",
+        "x-amz-apigw-id": "MqqlHGI6hcwEDMA=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aed-2e841a927366ffd515895bdd"
+      }
+    },
+    {
+      "test_name": "Missing endDate",
+      "endpoint": "business-days",
+      "params": {
+        "startDate": "2024-01-01",
+        "country": "AU"
+      },
+      "status_code": 400,
+      "expected_status": 400,
+      "passed": true,
+      "response": "{\"message\": \"Missing required request parameters: [endDate]\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:29 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "61",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "89ec5407-0256-49ab-bf98-8dae1703e1a9",
+        "x-amzn-ErrorType": "BadRequestException",
+        "x-amz-apigw-id": "MqqlHEJbBcwEdmA=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aed-7ee3720233892e1c58981db3"
+      }
+    },
+    {
+      "test_name": "Missing country",
+      "endpoint": "business-days",
+      "params": {
+        "startDate": "2024-01-01",
+        "endDate": "2024-01-31"
+      },
+      "status_code": 400,
+      "expected_status": 400,
+      "passed": true,
+      "response": "{\"message\": \"Missing required request parameters: [country]\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:29 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "61",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "d14f3568-82b4-4579-8a11-2b4e78c54b75",
+        "x-amzn-ErrorType": "BadRequestException",
+        "x-amz-apigw-id": "MqqlIH5BhcwEHkQ=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aed-42c814a228211c00588a4c9e"
+      }
+    },
+    {
+      "test_name": "Year 9999",
+      "endpoint": "business-days",
+      "params": {
+        "startDate": "9999-01-01",
+        "endDate": "9999-12-31",
+        "country": "AU"
+      },
+      "status_code": 500,
+      "expected_status": 200,
+      "passed": false,
+      "response": "{\"message\": \"Internal server error\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:29 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "36",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "bc879eea-3474-45dd-8d2c-e5d1a1807d4b",
+        "x-amzn-ErrorType": "InternalServerErrorException",
+        "x-amz-apigw-id": "MqqlIE-lBcwEP2A=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aed-5745ab696f661a401af9ba4c"
+      }
+    },
+    {
+      "test_name": "Invalid month",
+      "endpoint": "business-days",
+      "params": {
+        "startDate": "2024-13-01",
+        "endDate": "2024-13-31",
+        "country": "AU"
+      },
+      "status_code": 500,
+      "expected_status": 400,
+      "passed": false,
+      "response": "{\"message\": \"Internal server error\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:29 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "36",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "ac7b2633-ce4f-48bc-93e7-216d0951e329",
+        "x-amzn-ErrorType": "InternalServerErrorException",
+        "x-amz-apigw-id": "MqqlJE95hcwECRA=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aed-17fb1c463318ead517add955"
+      }
+    },
+    {
+      "test_name": "Invalid day",
+      "endpoint": "business-days",
+      "params": {
+        "startDate": "2024-01-32",
+        "endDate": "2024-02-30",
+        "country": "AU"
+      },
+      "status_code": 500,
+      "expected_status": 400,
+      "passed": false,
+      "response": "{\"message\": \"Internal server error\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:29 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "36",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "f7eae640-a9bf-4eae-99b8-2d5cb0951a4a",
+        "x-amzn-ErrorType": "InternalServerErrorException",
+        "x-amz-apigw-id": "MqqlJFgqhcwEF9Q=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aed-192dc62c210aea92469dfcee"
+      }
+    },
+    {
+      "test_name": "Invalid lat - too high",
+      "endpoint": "timezones",
+      "params": {
+        "lat": "91",
+        "lng": "0"
+      },
+      "status_code": 400,
+      "expected_status": 400,
+      "passed": true,
+      "response": "{\"error\":\"Latitude must be between -90 and 90\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:30 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "47",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "5529a032-3da4-48cc-920c-3c955b712fd5",
+        "x-amz-apigw-id": "MqqlKEc7BcwEHqw=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aed-3aef9c2c1266442b510cf480"
+      }
+    },
+    {
+      "test_name": "Invalid lat - too low",
+      "endpoint": "timezones",
+      "params": {
+        "lat": "-91",
+        "lng": "0"
+      },
+      "status_code": 400,
+      "expected_status": 400,
+      "passed": true,
+      "response": "{\"error\":\"Latitude must be between -90 and 90\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:30 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "47",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "bcc7ace6-3b7d-4e25-8f01-56f4c71b0f3c",
+        "x-amz-apigw-id": "MqqlQH99BcwEYCQ=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aee-51cc421c577ef9857d17b381"
+      }
+    },
+    {
+      "test_name": "Invalid lng - too high",
+      "endpoint": "timezones",
+      "params": {
+        "lat": "0",
+        "lng": "181"
+      },
+      "status_code": 400,
+      "expected_status": 400,
+      "passed": true,
+      "response": "{\"error\":\"Longitude must be between -180 and 180\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:30 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "50",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "ab3379cf-c933-440f-b233-11fdbb09ddf2",
+        "x-amz-apigw-id": "MqqlRHvZBcwECqQ=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aee-5a3504cd108688cc5c3422c2"
+      }
+    },
+    {
+      "test_name": "Invalid lng - too low",
+      "endpoint": "timezones",
+      "params": {
+        "lat": "0",
+        "lng": "-181"
+      },
+      "status_code": 400,
+      "expected_status": 400,
+      "passed": true,
+      "response": "{\"error\":\"Longitude must be between -180 and 180\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:30 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "50",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "6670f105-9a82-4671-9ba5-9b308d410645",
+        "x-amz-apigw-id": "MqqlRFhKBcwEdiA=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aee-5f6500970683813728f38239"
+      }
+    },
+    {
+      "test_name": "Non-numeric lat",
+      "endpoint": "timezones",
+      "params": {
+        "lat": "north",
+        "lng": "0"
+      },
+      "status_code": 400,
+      "expected_status": 400,
+      "passed": true,
+      "response": "{\"error\":\"Latitude must be between -90 and 90\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:30 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "47",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "fd00f0ac-f1e3-4ad7-a262-907526894f03",
+        "x-amz-apigw-id": "MqqlSH8ZhcwEX5w=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aee-25ce0581245d8ccf66f9c571"
+      }
+    },
+    {
+      "test_name": "Non-numeric lng",
+      "endpoint": "timezones",
+      "params": {
+        "lat": "0",
+        "lng": "east"
+      },
+      "status_code": 400,
+      "expected_status": 400,
+      "passed": true,
+      "response": "{\"error\":\"Longitude must be between -180 and 180\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:30 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "50",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "7f744d2a-abb0-490c-aee9-7c4324f0a087",
+        "x-amz-apigw-id": "MqqlSH7QBcwEHkQ=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aee-63abef5a400ce62d61e31e92"
+      }
+    },
+    {
+      "test_name": "Empty coordinates",
+      "endpoint": "timezones",
+      "params": {
+        "lat": "",
+        "lng": ""
+      },
+      "status_code": 400,
+      "expected_status": 400,
+      "passed": true,
+      "response": "{\"message\": \"Missing required request parameters: [lng, lat]\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:30 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "62",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "3d3f851f-bde0-405b-af47-da264765d46b",
+        "x-amzn-ErrorType": "BadRequestException",
+        "x-amz-apigw-id": "MqqlTFOwhcwEOMQ=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aee-1801d628162cd27d7444c251"
+      }
+    },
+    {
+      "test_name": "North Pole",
+      "endpoint": "timezones",
+      "params": {
+        "lat": "90",
+        "lng": "0"
+      },
+      "status_code": 500,
+      "expected_status": 200,
+      "passed": false,
+      "response": "{\"error\":\"Unable to determine timezone for coordinates\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:30 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "56",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "ddceba21-28b6-40cf-92d7-c8d0870e5a1a",
+        "x-amz-apigw-id": "MqqlTGt2BcwEJog=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aee-71b173320b24c77f7dcb271a"
+      }
+    },
+    {
+      "test_name": "South Pole",
+      "endpoint": "timezones",
+      "params": {
+        "lat": "-90",
+        "lng": "0"
+      },
+      "status_code": 500,
+      "expected_status": 200,
+      "passed": false,
+      "response": "{\"error\":\"Unable to determine timezone for coordinates\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:31 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "56",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "a6555b26-714c-4402-9bd9-ff6157c4e60c",
+        "x-amz-apigw-id": "MqqlaHBbBcwECIQ=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aee-33a7e411603f04644405c733"
+      }
+    },
+    {
+      "test_name": "International Date Line East",
+      "endpoint": "timezones",
+      "params": {
+        "lat": "0",
+        "lng": "180"
+      },
+      "status_code": 500,
+      "expected_status": 200,
+      "passed": false,
+      "response": "{\"error\":\"Unable to determine timezone for coordinates\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:31 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "56",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "c8b30d7e-2ceb-46b8-bbcb-7eab93c11474",
+        "x-amz-apigw-id": "MqqlbFTahcwEPNg=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aef-07f018dd5068c18f26aeca32"
+      }
+    },
+    {
+      "test_name": "International Date Line West",
+      "endpoint": "timezones",
+      "params": {
+        "lat": "0",
+        "lng": "-180"
+      },
+      "status_code": 500,
+      "expected_status": 200,
+      "passed": false,
+      "response": "{\"error\":\"Unable to determine timezone for coordinates\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:31 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "56",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "25f8b727-2cd3-46b9-a095-6dd47ae5a678",
+        "x-amz-apigw-id": "MqqlbEJGhcwEBKw=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aef-27ad088c427c70284ee7842d"
+      }
+    },
+    {
+      "test_name": "Prime Meridian",
+      "endpoint": "timezones",
+      "params": {
+        "lat": "51.4778",
+        "lng": "0"
+      },
+      "status_code": 200,
+      "expected_status": 200,
+      "passed": true,
+      "response": "{\"latitude\":51.4778,\"longitude\":0,\"timezone\":\"Europe/London\",\"offset\":\"+00:00\",\"dst\":true}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:31 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "90",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "a3b9abbf-248e-4b05-a604-150b04676e64",
+        "x-amz-apigw-id": "MqqlcEF5BcwEIKQ=",
+        "Cache-Control": "public, max-age=86400",
+        "X-Amzn-Trace-Id": "Root=1-685a8aef-6794151110f250b311fc6cd0"
+      }
+    },
+    {
+      "test_name": "Arctic Circle",
+      "endpoint": "timezones",
+      "params": {
+        "lat": "66.5",
+        "lng": "25.0"
+      },
+      "status_code": 500,
+      "expected_status": 200,
+      "passed": false,
+      "response": "{\"error\":\"Unable to determine timezone for coordinates\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:31 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "56",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "9936697e-26da-4e39-9dfb-d53073fa4e1f",
+        "x-amz-apigw-id": "MqqleFmYBcwEKkw=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aef-1633b8be155fb6932187ea2e"
+      }
+    },
+    {
+      "test_name": "Antarctic Circle",
+      "endpoint": "timezones",
+      "params": {
+        "lat": "-66.5",
+        "lng": "140.0"
+      },
+      "status_code": 200,
+      "expected_status": 200,
+      "passed": true,
+      "response": "{\"latitude\":-66.5,\"longitude\":140,\"timezone\":\"Australia/Sydney\",\"offset\":\"+10:00\",\"dst\":true}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:31 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "93",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "7163dab2-baf7-427f-8fd8-869c8ee52134",
+        "x-amz-apigw-id": "MqqlfFPgBcwEVVw=",
+        "Cache-Control": "public, max-age=86400",
+        "X-Amzn-Trace-Id": "Root=1-685a8aef-55059d372bb1dfce5c25ca72"
+      }
+    },
+    {
+      "test_name": "Equator Pacific",
+      "endpoint": "timezones",
+      "params": {
+        "lat": "0",
+        "lng": "-160"
+      },
+      "status_code": 500,
+      "expected_status": 200,
+      "passed": false,
+      "response": "{\"error\":\"Unable to determine timezone for coordinates\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:32 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "56",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "74bee954-4771-4909-9e6e-4cdec3429cea",
+        "x-amz-apigw-id": "MqqlgEfChcwECxA=",
+        "X-Amzn-Trace-Id": "Root=1-685a8aef-3a5dad8d5004538f2f477dac"
+      }
+    },
+    {
+      "test_name": "High precision coords",
+      "endpoint": "timezones",
+      "params": {
+        "lat": "51.477811234567",
+        "lng": "-0.001234567"
+      },
+      "status_code": 200,
+      "expected_status": 200,
+      "passed": true,
+      "response": "{\"latitude\":51.477811234567,\"longitude\":-0.001234567,\"timezone\":\"Europe/London\",\"offset\":\"+00:00\",\"dst\":true}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:32 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "109",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "d298fa3e-fac1-4023-b42b-d6e4f0af74c4",
+        "x-amz-apigw-id": "MqqlrEw_hcwEL-A=",
+        "Cache-Control": "public, max-age=86400",
+        "X-Amzn-Trace-Id": "Root=1-685a8af0-290b15335ffcac9f73571032"
+      }
+    },
+    {
+      "test_name": "Scientific notation",
+      "endpoint": "timezones",
+      "params": {
+        "lat": "5.1e1",
+        "lng": "-1e-3"
+      },
+      "status_code": 200,
+      "expected_status": 200,
+      "passed": true,
+      "response": "{\"latitude\":51,\"longitude\":-0.001,\"timezone\":\"Europe/London\",\"offset\":\"+00:00\",\"dst\":true}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:33 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "90",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "5c52798b-ca64-45eb-aed9-9f9ef878516c",
+        "x-amz-apigw-id": "MqqltEu4BcwEW5A=",
+        "Cache-Control": "public, max-age=86400",
+        "X-Amzn-Trace-Id": "Root=1-685a8af0-508b74d1231851c001176f56"
+      }
+    },
+    {
+      "test_name": "Missing lat",
+      "endpoint": "timezones",
+      "params": {
+        "lng": "0"
+      },
+      "status_code": 400,
+      "expected_status": 400,
+      "passed": true,
+      "response": "{\"message\": \"Missing required request parameters: [lat]\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:33 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "57",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "ac12b6dd-f65c-48a2-8404-afa80d5a1a84",
+        "x-amzn-ErrorType": "BadRequestException",
+        "x-amz-apigw-id": "MqqluFHThcwEP2A=",
+        "X-Amzn-Trace-Id": "Root=1-685a8af1-744557445b464fe9446c28d0"
+      }
+    },
+    {
+      "test_name": "Missing lng",
+      "endpoint": "timezones",
+      "params": {
+        "lat": "0"
+      },
+      "status_code": 400,
+      "expected_status": 400,
+      "passed": true,
+      "response": "{\"message\": \"Missing required request parameters: [lng]\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:33 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "57",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "03564504-e5dd-410d-b6fa-0022881820e8",
+        "x-amzn-ErrorType": "BadRequestException",
+        "x-amz-apigw-id": "MqqlvEvQhcwEAkw=",
+        "X-Amzn-Trace-Id": "Root=1-685a8af1-6b459bb87482e1fb641b8c98"
+      }
+    },
+    {
+      "test_name": "Both missing",
+      "endpoint": "timezones",
+      "params": {},
+      "status_code": 400,
+      "expected_status": 400,
+      "passed": true,
+      "response": "{\"message\": \"Missing required request parameters: [lng, lat]\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:33 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "62",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "8f3241b0-7073-4494-875d-30936acfaa85",
+        "x-amzn-ErrorType": "BadRequestException",
+        "x-amz-apigw-id": "MqqlvEEdBcwENGA=",
+        "X-Amzn-Trace-Id": "Root=1-685a8af1-7970856d09c5c69e678de46b"
+      }
+    },
+    {
+      "test_name": "With country param",
+      "endpoint": "timezones",
+      "params": {
+        "lat": "51.5",
+        "lng": "-0.1",
+        "country": "UK"
+      },
+      "status_code": 200,
+      "expected_status": 200,
+      "passed": true,
+      "response": "{\"latitude\":51.5,\"longitude\":-0.1,\"timezone\":\"Europe/London\",\"offset\":\"+00:00\",\"dst\":true}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:33 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "90",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "ff8a406b-a401-4013-8aa2-013be615c7d9",
+        "x-amz-apigw-id": "MqqlvEKWhcwEbEA=",
+        "Cache-Control": "public, max-age=86400",
+        "X-Amzn-Trace-Id": "Root=1-685a8af1-4dedb82c140d70e142561143"
+      }
+    },
+    {
+      "test_name": "With timezone param",
+      "endpoint": "timezones",
+      "params": {
+        "lat": "40.7",
+        "lng": "-74.0",
+        "timezone": "America/New_York"
+      },
+      "status_code": 500,
+      "expected_status": 200,
+      "passed": false,
+      "response": "{\"error\":\"Unable to determine timezone for coordinates\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:33 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "56",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "ed32409d-c7e1-4745-be3a-73ca6925c390",
+        "x-amz-apigw-id": "MqqlxGkNhcwEHDQ=",
+        "X-Amzn-Trace-Id": "Root=1-685a8af1-439f6b55372f2fcb3cd97bce"
+      }
+    },
+    {
+      "test_name": "Null Island",
+      "endpoint": "timezones",
+      "params": {
+        "lat": "0",
+        "lng": "0"
+      },
+      "status_code": 500,
+      "expected_status": 200,
+      "passed": false,
+      "response": "{\"error\":\"Unable to determine timezone for coordinates\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:33 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "56",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "7e468972-ec3d-436b-9a4c-d31151b501a6",
+        "x-amz-apigw-id": "MqqlxFKbBcwESqw=",
+        "X-Amzn-Trace-Id": "Root=1-685a8af1-1d0dfc4f13631fd90f18386c"
+      }
+    },
+    {
+      "test_name": "Fiji (crosses date line)",
+      "endpoint": "timezones",
+      "params": {
+        "lat": "-18.0",
+        "lng": "179.0"
+      },
+      "status_code": 500,
+      "expected_status": 200,
+      "passed": false,
+      "response": "{\"error\":\"Unable to determine timezone for coordinates\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:33 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "56",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "fdc933e8-7e00-4fda-839e-a40bc35888c6",
+        "x-amz-apigw-id": "MqqlyEVGBcwETaQ=",
+        "X-Amzn-Trace-Id": "Root=1-685a8af1-35bc224456cca5121d8c6e67"
+      }
+    },
+    {
+      "test_name": "Alaska",
+      "endpoint": "timezones",
+      "params": {
+        "lat": "64.0",
+        "lng": "-153.0"
+      },
+      "status_code": 500,
+      "expected_status": 200,
+      "passed": false,
+      "response": "{\"error\":\"Unable to determine timezone for coordinates\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:33 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "56",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "7e487791-e864-4f26-89ab-28e0f0a6d8b5",
+        "x-amz-apigw-id": "MqqlyHNTBcwELhA=",
+        "X-Amzn-Trace-Id": "Root=1-685a8af1-226584f46f3236aa3f38d09b"
+      }
+    },
+    {
+      "test_name": "Lat as int",
+      "endpoint": "timezones",
+      "params": {
+        "lat": 50,
+        "lng": 0
+      },
+      "status_code": 200,
+      "expected_status": 200,
+      "passed": true,
+      "response": "{\"latitude\":50,\"longitude\":0,\"timezone\":\"Europe/London\",\"offset\":\"+00:00\",\"dst\":true}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:33 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "85",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "a7872b3a-1b26-4781-922d-5c13c49039eb",
+        "x-amz-apigw-id": "MqqlzFGyBcwEftw=",
+        "Cache-Control": "public, max-age=86400",
+        "X-Amzn-Trace-Id": "Root=1-685a8af1-17a7bd6e011ec68b3099cb20"
+      }
+    },
+    {
+      "test_name": "Lng as float",
+      "endpoint": "timezones",
+      "params": {
+        "lat": "50.5",
+        "lng": 0.5
+      },
+      "status_code": 200,
+      "expected_status": 200,
+      "passed": true,
+      "response": "{\"latitude\":50.5,\"longitude\":0.5,\"timezone\":\"Europe/London\",\"offset\":\"+00:00\",\"dst\":true}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:33 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "89",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "ca97582d-7c30-4cc2-b9de-e9332ff6b9e2",
+        "x-amz-apigw-id": "Mqql2ELxBcwEbEA=",
+        "Cache-Control": "public, max-age=86400",
+        "X-Amzn-Trace-Id": "Root=1-685a8af1-2b09e064681c94bd7f3cf3b8"
+      }
+    },
+    {
+      "test_name": "Large parameter value - 100KB",
+      "endpoint": "holidays",
+      "params": {
+        "size": "100046 bytes"
+      },
+      "status_code": 414,
+      "expected_status": null,
+      "passed": true,
+      "response": "<html>\r\n<head><title>414 Request-URI Too Large</title></head>\r\n<body>\r\n<center><h1>414 Request-URI Too Large</h1></center>\r\n</body>\r\n</html>\r\n",
+      "headers": {
+        "Server": "awselb/2.0",
+        "Date": "Tue, 24 Jun 2025 11:24:34 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "142",
+        "Connection": "close"
+      }
+    },
+    {
+      "test_name": "Very large parameter - 1MB",
+      "endpoint": "holidays",
+      "params": {
+        "size": "1000046 bytes"
+      },
+      "status_code": 414,
+      "expected_status": null,
+      "passed": true,
+      "response": "<html>\r\n<head><title>414 Request-URI Too Large</title></head>\r\n<body>\r\n<center><h1>414 Request-URI Too Large</h1></center>\r\n</body>\r\n</html>\r\n",
+      "headers": {
+        "Server": "awselb/2.0",
+        "Date": "Tue, 24 Jun 2025 11:24:34 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "142",
+        "Connection": "close"
+      }
+    },
+    {
+      "test_name": "Multiple large params",
+      "endpoint": "holidays",
+      "params": {
+        "size": "200053 bytes"
+      },
+      "status_code": 414,
+      "expected_status": null,
+      "passed": true,
+      "response": "<html>\r\n<head><title>414 Request-URI Too Large</title></head>\r\n<body>\r\n<center><h1>414 Request-URI Too Large</h1></center>\r\n</body>\r\n</html>\r\n",
+      "headers": {
+        "Server": "awselb/2.0",
+        "Date": "Tue, 24 Jun 2025 11:24:34 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "142",
+        "Connection": "close"
+      }
+    },
+    {
+      "test_name": "SQL injection - OR",
+      "endpoint": "holidays",
+      "params": {
+        "country": "AU' OR '1'='1",
+        "year": "2024"
+      },
+      "status_code": 400,
+      "expected_status": 400,
+      "passed": true,
+      "response": "{\"error\":\"Invalid country code: AU' OR '1'='1. Supported countries: AU, UK, GB, DE, US, CA, NZ, FR, IT, ES\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:34 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "108",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "ac9c29ae-2e29-4f1a-b799-7fcd12fa4d41",
+        "X-Response-Time": "0ms",
+        "x-amz-apigw-id": "MqqmBHAoBcwEBog=",
+        "X-Amzn-Trace-Id": "Root=1-685a8af2-6dd01028471cf63c7f7d33e3"
+      }
+    },
+    {
+      "test_name": "SQL injection - UNION",
+      "endpoint": "holidays",
+      "params": {
+        "country": "AU' UNION SELECT * FROM users--",
+        "year": "2024"
+      },
+      "status_code": 400,
+      "expected_status": 400,
+      "passed": true,
+      "response": "{\"error\":\"Invalid country code: AU' UNION SELECT * FROM users--. Supported countries: AU, UK, GB, DE, US, CA, NZ, FR, IT, ES\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:35 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "126",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "d9193206-3f08-49cb-9b64-af4d8a0450a4",
+        "X-Response-Time": "0ms",
+        "x-amz-apigw-id": "MqqmCGqghcwELZw=",
+        "X-Amzn-Trace-Id": "Root=1-685a8af3-13ccb2486079f3c40986c301"
+      }
+    },
+    {
+      "test_name": "SQL injection - DROP",
+      "endpoint": "holidays",
+      "params": {
+        "country": "AU'; DROP TABLE holidays; --",
+        "year": "2024"
+      },
+      "status_code": 400,
+      "expected_status": 400,
+      "passed": true,
+      "response": "{\"error\":\"Invalid country code: AU'; DROP TABLE holidays; --. Supported countries: AU, UK, GB, DE, US, CA, NZ, FR, IT, ES\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:35 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "123",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "8793f89f-11a6-468b-982b-a2a69ca8494c",
+        "X-Response-Time": "1ms",
+        "x-amz-apigw-id": "MqqmCHTkhcwEYGQ=",
+        "X-Amzn-Trace-Id": "Root=1-685a8af3-2a8c11b62085702c6b253367"
+      }
+    },
+    {
+      "test_name": "NoSQL injection - $ne",
+      "endpoint": "holidays",
+      "params": {
+        "country": {
+          "$ne": "null"
+        },
+        "year": "2024"
+      },
+      "status_code": 400,
+      "expected_status": 400,
+      "passed": true,
+      "response": "{\"error\":\"Invalid country code: $ne. Supported countries: AU, UK, GB, DE, US, CA, NZ, FR, IT, ES\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:35 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "98",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "a4d14f54-8fc0-4fa9-8d26-988de0dcbb3d",
+        "X-Response-Time": "1ms",
+        "x-amz-apigw-id": "MqqmDEYsBcwEDJQ=",
+        "X-Amzn-Trace-Id": "Root=1-685a8af3-7c22c43f7c81b5b62df10231"
+      }
+    },
+    {
+      "test_name": "NoSQL injection - $gt",
+      "endpoint": "holidays",
+      "params": {
+        "country": "AU",
+        "year": {
+          "$gt": "0"
+        }
+      },
+      "status_code": 200,
+      "expected_status": 400,
+      "passed": false,
+      "response": "{\"country\":\"AU\",\"year\":\"NaN\",\"holidays\":[],\"count\":0}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:35 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "53",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "23e78707-0d7b-4256-a2ca-c9ab2862214e",
+        "X-Response-Time": "23ms",
+        "x-amz-apigw-id": "MqqmDEI-hcwENGA=",
+        "Cache-Control": "public, max-age=3600",
+        "X-Amzn-Trace-Id": "Root=1-685a8af3-74fd4b173ef6b963622d0071"
+      }
+    },
+    {
+      "test_name": "XSS - script tag",
+      "endpoint": "holidays",
+      "params": {
+        "country": "<script>alert('xss')</script>",
+        "year": "2024"
+      },
+      "status_code": 400,
+      "expected_status": 400,
+      "passed": true,
+      "response": "{\"error\":\"Invalid country code: <script>alert('xss')</script>. Supported countries: AU, UK, GB, DE, US, CA, NZ, FR, IT, ES\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:35 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "124",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "cbb26550-c090-4f4d-b181-2a26d55fd510",
+        "X-Response-Time": "1ms",
+        "x-amz-apigw-id": "MqqmEHBShcwEBog=",
+        "X-Amzn-Trace-Id": "Root=1-685a8af3-7591aebf6b89c3042ffc0d52"
+      }
+    },
+    {
+      "test_name": "XSS - img tag",
+      "endpoint": "holidays",
+      "params": {
+        "country": "<img src=x onerror=alert(1)>",
+        "year": "2024"
+      },
+      "status_code": 400,
+      "expected_status": 400,
+      "passed": true,
+      "response": "{\"error\":\"Invalid country code: <img src=x onerror=alert(1)>. Supported countries: AU, UK, GB, DE, US, CA, NZ, FR, IT, ES\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:35 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "123",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "ce6b620f-4184-4e91-976c-a179cbd42eb5",
+        "X-Response-Time": "1ms",
+        "x-amz-apigw-id": "MqqmFFnKhcwEZFw=",
+        "X-Amzn-Trace-Id": "Root=1-685a8af3-5cd453245c7bc9530ebdd105"
+      }
+    },
+    {
+      "test_name": "Command injection - semicolon",
+      "endpoint": "holidays",
+      "params": {
+        "country": "AU; cat /etc/passwd",
+        "year": "2024"
+      },
+      "status_code": 400,
+      "expected_status": 400,
+      "passed": true,
+      "response": "{\"error\":\"Invalid country code: AU; cat /etc/passwd. Supported countries: AU, UK, GB, DE, US, CA, NZ, FR, IT, ES\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:35 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "114",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "8944a6d1-416f-4a19-8107-3b027b6659ca",
+        "X-Response-Time": "0ms",
+        "x-amz-apigw-id": "MqqmFEd4hcwEbgw=",
+        "X-Amzn-Trace-Id": "Root=1-685a8af3-2679fc2b61bcd033561313b4"
+      }
+    },
+    {
+      "test_name": "Command injection - pipe",
+      "endpoint": "holidays",
+      "params": {
+        "country": "AU | ls -la",
+        "year": "2024"
+      },
+      "status_code": 400,
+      "expected_status": 400,
+      "passed": true,
+      "response": "{\"error\":\"Invalid country code: AU | ls -la. Supported countries: AU, UK, GB, DE, US, CA, NZ, FR, IT, ES\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:35 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "106",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "41aacce7-cbfb-4c48-9692-a262e72d728b",
+        "X-Response-Time": "1ms",
+        "x-amz-apigw-id": "MqqmGE-gBcwEE3g=",
+        "X-Amzn-Trace-Id": "Root=1-685a8af3-56d4d43b4fa37bdf752f9de2"
+      }
+    },
+    {
+      "test_name": "Path traversal",
+      "endpoint": "holidays",
+      "params": {
+        "country": "../../../etc/passwd",
+        "year": "2024"
+      },
+      "status_code": 400,
+      "expected_status": 400,
+      "passed": true,
+      "response": "{\"error\":\"Invalid country code: ../../../etc/passwd. Supported countries: AU, UK, GB, DE, US, CA, NZ, FR, IT, ES\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:35 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "114",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "555f3923-ff57-4874-916c-d7f520ed3db2",
+        "X-Response-Time": "1ms",
+        "x-amz-apigw-id": "MqqmGEKBhcwEYCQ=",
+        "X-Amzn-Trace-Id": "Root=1-685a8af3-4e031f946639f8df50ea0a79"
+      }
+    },
+    {
+      "test_name": "Unicode characters",
+      "endpoint": "holidays",
+      "params": {
+        "country": "AU\ud83c\udde6\ud83c\uddfa",
+        "year": "2024"
+      },
+      "status_code": 400,
+      "expected_status": 400,
+      "passed": true,
+      "response": "{\"error\":\"Invalid country code: AU\ud83c\udde6\ud83c\uddfa. Supported countries: AU, UK, GB, DE, US, CA, NZ, FR, IT, ES\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:35 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "105",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "9a540d48-0300-4ff3-8aa5-90d62568ff69",
+        "X-Response-Time": "0ms",
+        "x-amz-apigw-id": "MqqmHGrdBcwELZw=",
+        "X-Amzn-Trace-Id": "Root=1-685a8af3-25958a5156b5e90048199838"
+      }
+    },
+    {
+      "test_name": "Null bytes",
+      "endpoint": "holidays",
+      "params": {
+        "country": "AU\u0000",
+        "year": "2024"
+      },
+      "status_code": 400,
+      "expected_status": 400,
+      "passed": true,
+      "response": "{\"error\":\"Invalid country code: AU\\u0000. Supported countries: AU, UK, GB, DE, US, CA, NZ, FR, IT, ES\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:35 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "103",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "6fc703db-457b-4207-ba21-e63580983f7a",
+        "X-Response-Time": "1ms",
+        "x-amz-apigw-id": "MqqmHE0yBcwEW5A=",
+        "X-Amzn-Trace-Id": "Root=1-685a8af3-7d528db55d7c0bae4135f633"
+      }
+    },
+    {
+      "test_name": "Control characters",
+      "endpoint": "holidays",
+      "params": {
+        "country": "AU\n\r\t",
+        "year": "2024"
+      },
+      "status_code": 400,
+      "expected_status": 400,
+      "passed": true,
+      "response": "{\"error\":\"Invalid country code: AU\\n\\r\\t. Supported countries: AU, UK, GB, DE, US, CA, NZ, FR, IT, ES\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:35 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "103",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "7af8af84-1870-4877-b19c-889489cdeac4",
+        "X-Response-Time": "1ms",
+        "x-amz-apigw-id": "MqqmIEdRhcwELRw=",
+        "X-Amzn-Trace-Id": "Root=1-685a8af3-77bbe2774c48427e4e4aeeab"
+      }
+    },
+    {
+      "test_name": "No API key",
+      "endpoint": "holidays",
+      "params": {},
+      "status_code": 403,
+      "expected_status": 403,
+      "passed": true,
+      "response": "{\"message\":\"Forbidden\"}",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:35 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "23",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "6747a670-d1f2-4708-bee7-ee64f2db4074",
+        "x-amzn-ErrorType": "ForbiddenException",
+        "x-amz-apigw-id": "MqqmIHDWhcwEXpw=",
+        "X-Amzn-Trace-Id": "Root=1-685a8af3-6c38719f453a46ff6ca29809"
+      }
+    },
+    {
+      "test_name": "Invalid API key",
+      "endpoint": "holidays",
+      "params": {},
+      "status_code": 403,
+      "expected_status": 403,
+      "passed": true,
+      "response": "{\"message\":\"Forbidden\"}\n",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:35 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "24",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "664716f9-47f5-4b17-a1ba-b44702270615",
+        "x-amzn-ErrorType": "ForbiddenException",
+        "x-amz-apigw-id": "MqqmJECrhcwEaVw=",
+        "X-Amzn-Trace-Id": "Root=1-685a8af3-3193e59420b517e40720b899"
+      }
+    },
+    {
+      "test_name": "Empty API key",
+      "endpoint": "holidays",
+      "params": {},
+      "status_code": 403,
+      "expected_status": 403,
+      "passed": true,
+      "response": "{\"message\":\"Forbidden\"}\n",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:35 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "24",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "562cbdcc-7944-4899-980c-46b9af55de90",
+        "x-amzn-ErrorType": "ForbiddenException",
+        "x-amz-apigw-id": "MqqmJFFWhcwESCg=",
+        "X-Amzn-Trace-Id": "Root=1-685a8af3-5a60f958567fa5bd20038b75"
+      }
+    },
+    {
+      "test_name": "SQL in API key",
+      "endpoint": "holidays",
+      "params": {},
+      "status_code": 403,
+      "expected_status": 403,
+      "passed": true,
+      "response": "{\"message\":\"Forbidden\"}\n",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:35 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "24",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "8eb1bad5-520e-46d1-a1fb-2f8441d55ae7",
+        "x-amzn-ErrorType": "ForbiddenException",
+        "x-amz-apigw-id": "MqqmJF_JBcwEH5Q=",
+        "X-Amzn-Trace-Id": "Root=1-685a8af3-1f6fc5c54f084c507d385d26"
+      }
+    },
+    {
+      "test_name": "Very long API key",
+      "endpoint": "holidays",
+      "params": {},
+      "status_code": 403,
+      "expected_status": 403,
+      "passed": true,
+      "response": "{\"message\":\"Forbidden\"}\n",
+      "headers": {
+        "Date": "Tue, 24 Jun 2025 11:24:35 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "24",
+        "Connection": "keep-alive",
+        "x-amzn-RequestId": "53047638-7fae-408c-ade2-7fde06a2c73e",
+        "x-amzn-ErrorType": "ForbiddenException",
+        "x-amz-apigw-id": "MqqmKHuVhcwELBA=",
+        "X-Amzn-Trace-Id": "Root=1-685a8af3-62f8a64220c812ae0dd6b219"
+      }
+    }
+  ]
+}

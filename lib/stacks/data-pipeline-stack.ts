@@ -7,6 +7,8 @@ import * as iam from 'aws-cdk-lib/aws-iam';
 import * as logs from 'aws-cdk-lib/aws-logs';
 import * as events from 'aws-cdk-lib/aws-events';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
+import * as ssm from 'aws-cdk-lib/aws-ssm';
+import * as path from 'path';
 import { Construct } from 'constructs';
 import { AlmanacConfig } from '../config';
 import { Phase0Stack } from './phase0-stack';
@@ -21,8 +23,10 @@ export class DataPipelineStack extends cdk.Stack {
   public readonly holidayETLJob: glue.CfnJob;
   public readonly timezoneETLJob: glue.CfnJob;
   public readonly australiaHolidayETLJob: glue.CfnJob;
+  public readonly governmentDataFetcherLambda: lambda.Function;
   public readonly dataQualityLambda: lambda.Function;
   public readonly pipelineStateMachine: stepfunctions.StateMachine;
+  public readonly governmentDataStateMachine: stepfunctions.StateMachine;
 
   constructor(scope: Construct, id: string, props: DataPipelineStackProps) {
     super(scope, id, props);
@@ -32,6 +36,10 @@ export class DataPipelineStack extends cdk.Stack {
     // Create Lambda functions
     this.dataValidationLambda = this.createDataValidationLambda(config, phase0Stack);
     this.dataQualityLambda = this.createDataQualityLambda(config, phase0Stack);
+    this.governmentDataFetcherLambda = this.createGovernmentDataFetcherLambda(config, phase0Stack);
+    
+    // Create SSM parameters for data sources
+    this.createDataSourceParameters(config);
 
     // Create Glue crawlers
     const holidayCrawler = this.createHolidayCrawler(config, phase0Stack);
@@ -55,6 +63,9 @@ export class DataPipelineStack extends cdk.Stack {
     
     // Create monthly schedule for Australian holidays
     this.createAustraliaHolidaySchedule(config);
+    
+    // Create government data fetching workflow
+    this.governmentDataStateMachine = this.createGovernmentDataWorkflow(config, phase0Stack);
 
     // Create outputs
     this.createOutputs();
@@ -192,6 +203,61 @@ function isValidDate(dateString) {
     phase0Stack.rawBucket.grantRead(func);
     phase0Stack.stagingBucket.grantReadWrite(func);
     phase0Stack.validatedBucket.grantWrite(func);
+
+    return func;
+  }
+
+  private createGovernmentDataFetcherLambda(config: AlmanacConfig, phase0Stack: Phase0Stack): lambda.Function {
+    // Create a Lambda function that uses the existing Glue script
+    const func = new lambda.Function(this, 'GovernmentDataFetcher', {
+      functionName: `${config.projectName}-${config.environment}-gov-data-fetcher`,
+      runtime: lambda.Runtime.PYTHON_3_11,
+      handler: 'index.handler',
+      code: lambda.Code.fromAsset(path.join(__dirname, '../../src/lambdas/gov-data-fetcher')),
+      timeout: cdk.Duration.minutes(15),
+      memorySize: 1024,
+      environment: {
+        HOLIDAYS_TABLE: phase0Stack.holidaysTable.tableName,
+        ENVIRONMENT: config.environment,
+        LOG_LEVEL: config.environment === 'prod' ? 'INFO' : 'DEBUG',
+        DATA_GOV_AU_2024: 'https://data.gov.au/data/dataset/b1bc6077-dadd-4f61-9f8c-002ab2cdff10/resource/9e920340-0744-4031-a497-98ab796633e8/download/australian_public_holidays_2024.csv',
+        DATA_GOV_AU_2025: 'https://data.gov.au/data/dataset/b1bc6077-dadd-4f61-9f8c-002ab2cdff10/resource/4d4d744b-50ed-45b9-ae77-760bc478ad75/download/australian_public_holidays_2025.csv',
+        NSW_TRANSPORT_API: 'https://opendata.transport.nsw.gov.au/data/dataset/963e4946-46c0-4c9c-b4dc-5033c9e61f5c/resource/15c69970-8fa3-4fe3-ac35-0f3cbe10447e/download/public_holiday-2019-2023.csv',
+        VIC_GOV_API: 'https://discover.data.vic.gov.au/dataset/a8bc540d-181b-4fb5-8110-5fe52a04f6a7/resource/5b5ffd01-6f6e-499e-9143-71767756567f/download/important-dates-2025.csv',
+      },
+      tracing: lambda.Tracing.ACTIVE,
+      layers: [
+        lambda.LayerVersion.fromLayerVersionArn(
+          this,
+          'PowertoolsLayer',
+          `arn:aws:lambda:${this.region}:017000801446:layer:AWSLambdaPowertoolsPythonV2:46`
+        ),
+      ],
+    });
+
+    // Grant permissions
+    phase0Stack.holidaysTable.grantReadWriteData(func);
+    
+    // Grant SSM parameter read permissions
+    func.addToRolePolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: ['ssm:GetParameter', 'ssm:GetParameters'],
+      resources: [
+        `arn:aws:ssm:${this.region}:${this.account}:parameter/almanac/data-sources/*`,
+      ],
+    }));
+    
+    // Grant CloudWatch metrics permissions
+    func.addToRolePolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: ['cloudwatch:PutMetricData'],
+      resources: ['*'],
+    }));
+    
+    // Grant SNS permissions if topic exists
+    if (phase0Stack.approvalTopic) {
+      phase0Stack.approvalTopic.grantPublish(func);
+    }
 
     return func;
   }
@@ -474,7 +540,7 @@ function calculateOverallScore(metrics) {
       command: {
         name: 'glueetl',
         pythonVersion: '3',
-        scriptLocation: `s3://${phase0Stack.glueScriptsBucket.bucketName}/scripts/australia_holiday_etl.py`,
+        scriptLocation: `s3://${phase0Stack.glueScriptsBucket.bucketName}/scripts/australia_holiday_etl_gov.py`,
       },
       defaultArguments: {
         '--job-language': 'python',
@@ -717,6 +783,118 @@ function calculateOverallScore(metrics) {
     });
   }
 
+  private createDataSourceParameters(config: AlmanacConfig): void {
+    // Create SSM parameters for government data sources
+    new ssm.StringParameter(this, 'DataSourcesConfig', {
+      parameterName: '/almanac/data-sources/config',
+      stringValue: JSON.stringify({
+        national: {
+          '2024': 'https://data.gov.au/data/dataset/b1bc6077-dadd-4f61-9f8c-002ab2cdff10/resource/9e920340-0744-4031-a497-98ab796633e8/download/australian_public_holidays_2024.csv',
+          '2025': 'https://data.gov.au/data/dataset/b1bc6077-dadd-4f61-9f8c-002ab2cdff10/resource/4d4d744b-50ed-45b9-ae77-760bc478ad75/download/australian_public_holidays_2025.csv',
+        },
+        states: {
+          nsw: 'https://opendata.transport.nsw.gov.au/data/dataset/963e4946-46c0-4c9c-b4dc-5033c9e61f5c/resource/15c69970-8fa3-4fe3-ac35-0f3cbe10447e/download/public_holiday-2019-2023.csv',
+          vic: 'https://discover.data.vic.gov.au/dataset/a8bc540d-181b-4fb5-8110-5fe52a04f6a7/resource/5b5ffd01-6f6e-499e-9143-71767756567f/download/important-dates-2025.csv',
+        }
+      }),
+      description: 'Government data source URLs for holiday data fetching',
+      tier: ssm.ParameterTier.STANDARD,
+    });
+  }
+
+  private createGovernmentDataWorkflow(
+    config: AlmanacConfig,
+    phase0Stack: Phase0Stack
+  ): stepfunctions.StateMachine {
+    // Fetch government data
+    const fetchGovernmentData = new sfnTasks.LambdaInvoke(this, 'FetchGovernmentData', {
+      lambdaFunction: this.governmentDataFetcherLambda,
+      outputPath: '$.Payload',
+      retryOnServiceExceptions: true,
+      payloadResponseOnly: true,
+    });
+    
+    // Check data quality
+    const checkFetchedDataQuality = new sfnTasks.LambdaInvoke(this, 'CheckFetchedDataQuality', {
+      lambdaFunction: this.dataQualityLambda,
+      payload: stepfunctions.TaskInput.fromObject({
+        tableName: phase0Stack.holidaysTable.tableName,
+        dataType: 'holidays',
+      }),
+      outputPath: '$.Payload',
+      payloadResponseOnly: true,
+    });
+    
+    // Send success notification
+    const notifyFetchSuccess = new sfnTasks.SnsPublish(this, 'NotifyFetchSuccess', {
+      topic: phase0Stack.approvalTopic,
+      subject: 'Government Data Fetch Successful',
+      message: stepfunctions.TaskInput.fromJsonPathAt('$'),
+    });
+    
+    // Send failure notification
+    const notifyFetchFailure = new sfnTasks.SnsPublish(this, 'NotifyFetchFailure', {
+      topic: phase0Stack.approvalTopic,
+      subject: 'Government Data Fetch Failed',
+      message: stepfunctions.TaskInput.fromJsonPathAt('$'),
+    });
+    
+    // Handle errors
+    const handleError = new stepfunctions.Pass(this, 'HandleFetchError', {
+      parameters: {
+        error: stepfunctions.JsonPath.stringAt('$.Error'),
+        cause: stepfunctions.JsonPath.stringAt('$.Cause'),
+        timestamp: stepfunctions.JsonPath.stringAt('$$.State.EnteredTime'),
+      },
+    }).next(notifyFetchFailure);
+    
+    // Build workflow
+    const definition = fetchGovernmentData
+      .addCatch(handleError, {
+        errors: ['States.ALL'],
+        resultPath: '$.error',
+      })
+      .next(checkFetchedDataQuality)
+      .next(
+        new stepfunctions.Choice(this, 'DataQualityAcceptable?')
+          .when(
+            stepfunctions.Condition.numberGreaterThanEquals('$.qualityScore', 95),
+            notifyFetchSuccess
+          )
+          .otherwise(
+            new stepfunctions.Pass(this, 'QualityBelowThreshold', {
+              parameters: {
+                message: 'Data quality below threshold',
+                qualityScore: stepfunctions.JsonPath.numberAt('$.qualityScore'),
+                metrics: stepfunctions.JsonPath.objectAt('$.metrics'),
+              },
+            }).next(notifyFetchFailure)
+          )
+      );
+    
+    const stateMachine = new stepfunctions.StateMachine(this, 'GovernmentDataStateMachine', {
+      stateMachineName: `${config.projectName}-${config.environment}-gov-data-fetcher`,
+      definition,
+      timeout: cdk.Duration.hours(1),
+      tracingEnabled: true,
+    });
+    
+    // Create EventBridge rule for monthly execution
+    const monthlyRule = new events.Rule(this, 'GovernmentDataMonthlySchedule', {
+      ruleName: `${config.projectName}-${config.environment}-gov-data-monthly`,
+      description: 'Monthly government data refresh',
+      schedule: events.Schedule.cron({
+        minute: '0',
+        hour: '1',
+        day: '1', // First day of month
+      }),
+    });
+    
+    monthlyRule.addTarget(new targets.SfnStateMachine(stateMachine));
+    
+    return stateMachine;
+  }
+
   private createOutputs(): void {
     new cdk.CfnOutput(this, 'DataValidationLambdaArn', {
       value: this.dataValidationLambda.functionArn,
@@ -746,6 +924,16 @@ function calculateOverallScore(metrics) {
     new cdk.CfnOutput(this, 'PipelineStateMachineArn', {
       value: this.pipelineStateMachine.stateMachineArn,
       description: 'ARN of the data pipeline state machine',
+    });
+    
+    new cdk.CfnOutput(this, 'GovernmentDataFetcherArn', {
+      value: this.governmentDataFetcherLambda.functionArn,
+      description: 'ARN of the government data fetcher Lambda',
+    });
+    
+    new cdk.CfnOutput(this, 'GovernmentDataStateMachineArn', {
+      value: this.governmentDataStateMachine.stateMachineArn,
+      description: 'ARN of the government data fetcher state machine',
     });
   }
 }
