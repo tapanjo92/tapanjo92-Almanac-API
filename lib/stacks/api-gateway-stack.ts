@@ -207,14 +207,37 @@ export class ApiGatewayStack extends cdk.Stack {
     lambdaFunction: lambda.Function,
     validator: apigateway.RequestValidator
   ): void {
-    resource.addMethod('GET', new apigateway.LambdaIntegration(lambdaFunction), {
+    // Create request model for business days calculation
+    const businessDaysModel = new apigateway.Model(this, 'BusinessDaysModel', {
+      restApi: this.api,
+      contentType: 'application/json',
+      description: 'Business days calculation request',
+      schema: {
+        type: apigateway.JsonSchemaType.OBJECT,
+        properties: {
+          startDate: { type: apigateway.JsonSchemaType.STRING },
+          days: { type: apigateway.JsonSchemaType.NUMBER },
+          country: { type: apigateway.JsonSchemaType.STRING },
+          region: { type: apigateway.JsonSchemaType.STRING },
+          includeWeekends: { type: apigateway.JsonSchemaType.BOOLEAN },
+        },
+        required: ['startDate', 'days', 'country'],
+      },
+    });
+
+    // Create body validator
+    const bodyValidator = new apigateway.RequestValidator(this, 'BusinessDaysBodyValidator', {
+      restApi: this.api,
+      requestValidatorName: 'Validate body',
+      validateRequestBody: true,
+      validateRequestParameters: false,
+    });
+
+    resource.addMethod('POST', new apigateway.LambdaIntegration(lambdaFunction), {
       apiKeyRequired: true,
-      requestValidator: validator,
-      requestParameters: {
-        'method.request.querystring.startDate': true,
-        'method.request.querystring.endDate': true,
-        'method.request.querystring.country': true,
-        'method.request.querystring.includeWeekends': false,
+      requestValidator: bodyValidator,
+      requestModels: {
+        'application/json': businessDaysModel,
       },
       methodResponses: [
         {
@@ -240,9 +263,8 @@ export class ApiGatewayStack extends cdk.Stack {
       apiKeyRequired: true,
       requestValidator: validator,
       requestParameters: {
-        'method.request.querystring.timezone': false,
-        'method.request.querystring.country': false,
-        'method.request.querystring.city': false,
+        'method.request.querystring.lat': true,
+        'method.request.querystring.lng': true,
       },
       methodResponses: [
         {
@@ -376,11 +398,13 @@ export class ApiGatewayStack extends cdk.Stack {
     new cdk.CfnOutput(this, 'ApiUrl', {
       value: this.api.url,
       description: 'API Gateway URL',
+      exportName: `${this.stackName}:ApiUrl`,
     });
 
     new cdk.CfnOutput(this, 'ApiId', {
       value: this.api.restApiId,
       description: 'API Gateway ID',
+      exportName: `${this.stackName}:ApiId`,
     });
 
     new cdk.CfnOutput(this, 'ApiKeyId', {

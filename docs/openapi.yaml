@@ -103,44 +103,48 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
   /business-days:
-    get:
+    post:
       summary: Calculate business days
-      description: Calculates the number of business days between two dates for a country
+      description: Calculates the end date after adding/subtracting business days from a start date
       operationId: calculateBusinessDays
       tags:
         - Business Days
-      parameters:
-        - name: startDate
-          in: query
-          description: Start date in YYYY-MM-DD format
-          required: true
-          schema:
-            type: string
-            format: date
-            example: "2024-01-01"
-        - name: endDate
-          in: query
-          description: End date in YYYY-MM-DD format
-          required: true
-          schema:
-            type: string
-            format: date
-            example: "2024-01-31"
-        - name: country
-          in: query
-          description: ISO country code for holiday calculations
-          required: true
-          schema:
-            type: string
-            pattern: '^[A-Z]{2}$'
-            example: AU
-        - name: includeWeekends
-          in: query
-          description: Include weekends in the calculation
-          required: false
-          schema:
-            type: boolean
-            default: false
+      requestBody:
+        description: Business days calculation request
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - startDate
+                - days
+                - country
+              properties:
+                startDate:
+                  type: string
+                  format: date
+                  description: Start date in YYYY-MM-DD format
+                  example: "2024-01-15"
+                days:
+                  type: integer
+                  description: Number of business days to add (positive) or subtract (negative)
+                  minimum: -365
+                  maximum: 365
+                  example: 10
+                country:
+                  type: string
+                  pattern: '^[A-Z]{2}$'
+                  description: ISO country code for holiday calculations
+                  example: AU
+                region:
+                  type: string
+                  description: Region/state code for region-specific holidays
+                  example: NSW
+                includeWeekends:
+                  type: boolean
+                  description: Include weekends in the calculation
+                  default: false
       responses:
         '200':
           description: Successful response
@@ -149,36 +153,43 @@ paths:
               schema:
                 type: object
                 properties:
-                  data:
-                    type: object
-                    properties:
-                      startDate:
-                        type: string
-                        format: date
-                      endDate:
-                        type: string
-                        format: date
-                      country:
-                        type: string
-                      businessDays:
-                        type: integer
-                        example: 22
-                      totalDays:
-                        type: integer
-                        example: 31
-                      weekends:
-                        type: integer
-                        example: 8
-                      holidays:
-                        type: integer
-                        example: 1
-                      holidayDates:
-                        type: array
-                        items:
-                          type: string
-                          format: date
-                  metadata:
-                    $ref: '#/components/schemas/Metadata'
+                  startDate:
+                    type: string
+                    format: date
+                    description: The start date provided
+                    example: "2024-01-15"
+                  endDate:
+                    type: string
+                    format: date
+                    description: The calculated end date
+                    example: "2024-01-29"
+                  businessDays:
+                    type: integer
+                    description: Number of business days requested
+                    example: 10
+                  totalDays:
+                    type: integer
+                    description: Total calendar days between start and end
+                    example: 14
+                  weekendDays:
+                    type: integer
+                    description: Number of weekend days skipped
+                    example: 4
+                  holidays:
+                    type: array
+                    description: Holiday dates that were skipped
+                    items:
+                      type: string
+                      format: date
+                    example: ["2024-01-26"]
+                  country:
+                    type: string
+                    description: Country code used
+                    example: AU
+                  region:
+                    type: string
+                    description: Region code used (if provided)
+                    example: NSW
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -191,33 +202,31 @@ paths:
   /timezones:
     get:
       summary: Get timezone information
-      description: Returns timezone information for a specific timezone or country
+      description: Returns timezone information for geographic coordinates
       operationId: getTimezones
       tags:
         - Timezones
       parameters:
-        - name: timezone
+        - name: lat
           in: query
-          description: IANA timezone identifier (e.g., Australia/Sydney)
-          required: false
+          description: Latitude coordinate
+          required: true
           schema:
-            type: string
-            example: Australia/Sydney
-        - name: country
+            type: number
+            format: double
+            minimum: -90
+            maximum: 90
+            example: -33.8688
+        - name: lng
           in: query
-          description: ISO country code to get all timezones for a country
-          required: false
+          description: Longitude coordinate
+          required: true
           schema:
-            type: string
-            pattern: '^[A-Z]{2}$'
-            example: AU
-        - name: city
-          in: query
-          description: City name to search for timezone
-          required: false
-          schema:
-            type: string
-            example: Sydney
+            type: number
+            format: double
+            minimum: -180
+            maximum: 180
+            example: 151.2093
       responses:
         '200':
           description: Successful response
@@ -226,15 +235,30 @@ paths:
               schema:
                 type: object
                 properties:
-                  data:
-                    type: object
-                    properties:
-                      timezones:
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/Timezone'
-                  metadata:
-                    $ref: '#/components/schemas/Metadata'
+                  latitude:
+                    type: number
+                    description: The latitude coordinate provided
+                    example: -33.8688
+                  longitude:
+                    type: number
+                    description: The longitude coordinate provided
+                    example: 151.2093
+                  timezone:
+                    type: string
+                    description: IANA timezone identifier
+                    example: "Australia/Sydney"
+                  offset:
+                    type: string
+                    description: Current UTC offset
+                    example: "+10:00"
+                  dst:
+                    type: boolean
+                    description: Whether daylight saving time is active
+                    example: true
+                  location:
+                    type: string
+                    description: Location description (if available)
+                    example: "Sydney, Australia"
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':

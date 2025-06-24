@@ -1,15 +1,11 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, QueryCommand, QueryCommandInput } from '@aws-sdk/lib-dynamodb';
 import { Logger } from '@aws-lambda-powertools/logger';
 import { Tracer } from '@aws-lambda-powertools/tracer';
 import { Metrics, MetricUnit } from '@aws-lambda-powertools/metrics';
 import { HolidayRecord, Holiday } from '../../common/types';
 import { validateCountryCode, validateYear, ValidationError } from '../../common/utils';
-
-// Initialize AWS SDK clients and utilities
-const dynamoClient = new DynamoDBClient({ region: process.env.AWS_REGION });
-const docClient = DynamoDBDocumentClient.from(dynamoClient);
+import { CachedDynamoDBClient } from '../../common/dax-client';
+import { dataAccessService } from '../../common/data-access';
 
 const logger = new Logger({ serviceName: 'holidays-function' });
 const tracer = new Tracer({ serviceName: 'holidays-function' });
@@ -21,6 +17,9 @@ if (!HOLIDAYS_TABLE) {
   throw new Error('HOLIDAYS_TABLE environment variable is not set');
 }
 
+// Initialize DAX-enabled client
+const cachedClient = new CachedDynamoDBClient(HOLIDAYS_TABLE);
+
 interface HolidayQueryParams {
   country: string;
   year: string;
@@ -31,10 +30,22 @@ interface HolidayQueryParams {
 export const handler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
-  logger.info('Received request', { event });
+  const startTime = Date.now();
+  logger.info('Received request', { 
+    path: event.path,
+    queryStringParameters: event.queryStringParameters,
+    requestContext: event.requestContext,
+  });
+  
+  // Extract auth context
+  const authContext = (event.requestContext as any).authorizer || {};
+  const cognitoSub = authContext.cognitoSub;
+  const tier = authContext.tier || 'free';
+  const apiKey = authContext.apiKey;
   
   // Add custom metric
   metrics.addMetric('HolidaysRequests', MetricUnit.Count, 1);
+  metrics.addMetric(`HolidaysRequests_${tier}`, MetricUnit.Count, 1);
 
   try {
     // Validate query parameters
@@ -51,9 +62,32 @@ export const handler = async (
     
     // No region filtering needed for current implementation
     const filteredHolidays = holidays;
+    
+    const responseTime = Date.now() - startTime;
+    const responseBody = JSON.stringify({
+      country: params.country,
+      year: params.year,
+      holidays: filteredHolidays,
+      count: filteredHolidays.length,
+    });
+    
+    // Track usage if user is authenticated
+    if (cognitoSub) {
+      await dataAccessService.trackUsage(
+        cognitoSub,
+        '/holidays',
+        'GET',
+        200,
+        responseTime,
+        Buffer.byteLength(responseBody),
+        tier,
+        apiKey
+      ).catch(err => logger.error('Failed to track usage', { error: err }));
+    }
 
     // Add success metric
     metrics.addMetric('HolidaysSuccess', MetricUnit.Count, 1);
+    metrics.addMetric('HolidaysResponseTime', MetricUnit.Milliseconds, responseTime);
     metrics.publishStoredMetrics();
 
     return {
@@ -61,25 +95,39 @@ export const handler = async (
       headers: {
         'Content-Type': 'application/json',
         'Cache-Control': 'public, max-age=3600', // Cache for 1 hour
+        'X-Response-Time': `${responseTime}ms`,
       },
-      body: JSON.stringify({
-        country: params.country,
-        year: params.year,
-        holidays: filteredHolidays,
-        count: filteredHolidays.length,
-      }),
+      body: responseBody,
     };
   } catch (error) {
     logger.error('Error processing request', { error });
+    
+    const statusCode = error instanceof ValidationError ? 400 : 500;
+    const responseTime = Date.now() - startTime;
+    
+    // Track usage even for errors
+    if (cognitoSub) {
+      await dataAccessService.trackUsage(
+        cognitoSub,
+        '/holidays',
+        'GET',
+        statusCode,
+        responseTime,
+        0,
+        tier,
+        apiKey
+      ).catch(err => logger.error('Failed to track usage', { error: err }));
+    }
     
     // Add error metric
     metrics.addMetric('HolidaysErrors', MetricUnit.Count, 1);
     metrics.publishStoredMetrics();
 
     return {
-      statusCode: error instanceof ValidationError ? 400 : 500,
+      statusCode,
       headers: {
         'Content-Type': 'application/json',
+        'X-Response-Time': `${responseTime}ms`,
       },
       body: JSON.stringify({
         error: error instanceof Error ? error.message : 'Internal server error',
@@ -110,32 +158,31 @@ function validateQueryParams(params: any): HolidayQueryParams {
 }
 
 async function queryHolidays(params: HolidayQueryParams): Promise<Holiday[]> {
-  const queryParams: QueryCommandInput = {
-    TableName: HOLIDAYS_TABLE,
+  const queryParams = {
     KeyConditionExpression: 'PK = :pk',
     ExpressionAttributeValues: {
       ':pk': `COUNTRY#${params.country}`,
-    },
+    } as any,
     ScanIndexForward: true, // Sort by date ascending
   };
 
   // Add year/month filters
   if (params.month) {
     queryParams.KeyConditionExpression += ' AND begins_with(SK, :sk)';
-    queryParams.ExpressionAttributeValues![':sk'] = `DATE#${params.year}-${params.month.padStart(2, '0')}`;
+    queryParams.ExpressionAttributeValues[':sk'] = `DATE#${params.year}-${params.month.padStart(2, '0')}`;
   } else {
     queryParams.KeyConditionExpression += ' AND begins_with(SK, :sk)';
-    queryParams.ExpressionAttributeValues![':sk'] = `DATE#${params.year}`;
+    queryParams.ExpressionAttributeValues[':sk'] = `DATE#${params.year}`;
   }
 
   // Add type filter if provided
   if (params.type) {
     queryParams.FilterExpression = '#type = :type';
     queryParams.ExpressionAttributeNames = { '#type': 'type' };
-    queryParams.ExpressionAttributeValues![':type'] = params.type;
+    queryParams.ExpressionAttributeValues[':type'] = params.type;
   }
 
-  const response = await docClient.send(new QueryCommand(queryParams));
+  const response = await cachedClient.query(queryParams);
   
   return (response.Items as HolidayRecord[] || []).map(item => ({
     date: item.date,

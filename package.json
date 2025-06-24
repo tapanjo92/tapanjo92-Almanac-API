@@ -15,6 +15,7 @@
     "test": "jest",
     "deploy:dev": "pnpm run build:layer && cdk deploy --all --context env=dev --require-approval never",
     "deploy:prod": "pnpm run build:layer && cdk deploy --all --context env=prod --require-approval never",
+    "post-deploy:phase3": "./scripts/post-deploy-phase3.sh",
     "synth": "cdk synth",
     "diff": "cdk diff",
     "destroy": "cdk destroy --all",
@@ -23,9 +24,6 @@
   "author": "Almanac API Team",
   "license": "UNLICENSED",
   "devDependencies": {
-    "@aws-lambda-powertools/logger": "^2.22.0",
-    "@aws-lambda-powertools/metrics": "^2.22.0",
-    "@aws-lambda-powertools/tracer": "^2.22.0",
     "@aws-sdk/client-dynamodb": "^3.830.0",
     "@aws-sdk/lib-dynamodb": "^3.830.0",
     "@types/aws-lambda": "^8.10.137",
@@ -39,7 +37,12 @@
     "typescript": "~5.4.3"
   },
   "dependencies": {
+    "@aws-lambda-powertools/logger": "^2.22.0",
+    "@aws-lambda-powertools/metrics": "^2.22.0",
+    "@aws-lambda-powertools/tracer": "^2.22.0",
+    "@aws-sdk/client-dax": "^3.835.0",
     "aws-cdk-lib": "2.147.0",
+    "aws-jwt-verify": "^5.1.0",
     "constructs": "^10.0.0",
     "source-map-support": "^0.5.21"
   }
