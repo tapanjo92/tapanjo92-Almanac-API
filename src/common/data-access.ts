@@ -1,6 +1,6 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, GetCommand, PutCommand, UpdateCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
-import { DaxClient } from '@aws-sdk/client-dax';
+import { DAXClient } from '@aws-sdk/client-dax';
 import { Logger } from '@aws-lambda-powertools/logger';
 
 const logger = new Logger({ serviceName: 'data-access' });
@@ -16,7 +16,7 @@ docClient = DynamoDBDocumentClient.from(dynamoClient);
 // Initialize DAX client if endpoint is available
 if (process.env.DAX_ENDPOINT) {
   try {
-    const dax = new DaxClient({
+    const dax = new DAXClient({
       endpoints: [process.env.DAX_ENDPOINT],
       region: process.env.AWS_REGION,
     });

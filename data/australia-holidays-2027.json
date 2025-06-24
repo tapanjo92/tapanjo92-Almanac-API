@@ -1,0 +1,201 @@
+[
+  {
+    "date": "2027-01-01",
+    "name": "New Year's Day",
+    "country": "AU",
+    "type": "public",
+    "regions": ["ALL"]
+  },
+  {
+    "date": "2027-01-26",
+    "name": "Australia Day",
+    "country": "AU",
+    "type": "public",
+    "regions": ["ALL"]
+  },
+  {
+    "date": "2027-03-01",
+    "name": "Labour Day",
+    "country": "AU",
+    "type": "public",
+    "regions": ["WA"]
+  },
+  {
+    "date": "2027-03-08",
+    "name": "Canberra Day",
+    "country": "AU",
+    "type": "public",
+    "regions": ["ACT"]
+  },
+  {
+    "date": "2027-03-08",
+    "name": "Labour Day",
+    "country": "AU",
+    "type": "public",
+    "regions": ["VIC"]
+  },
+  {
+    "date": "2027-03-08",
+    "name": "Adelaide Cup Day",
+    "country": "AU",
+    "type": "public",
+    "regions": ["SA"]
+  },
+  {
+    "date": "2027-03-08",
+    "name": "Eight Hours Day",
+    "country": "AU",
+    "type": "public",
+    "regions": ["TAS"]
+  },
+  {
+    "date": "2027-03-26",
+    "name": "Good Friday",
+    "country": "AU",
+    "type": "public",
+    "regions": ["ALL"]
+  },
+  {
+    "date": "2027-03-27",
+    "name": "Easter Saturday",
+    "country": "AU",
+    "type": "public",
+    "regions": ["ACT", "NSW", "NT", "QLD", "SA", "VIC"]
+  },
+  {
+    "date": "2027-03-29",
+    "name": "Easter Monday",
+    "country": "AU",
+    "type": "public",
+    "regions": ["ALL"]
+  },
+  {
+    "date": "2027-03-30",
+    "name": "Easter Tuesday",
+    "country": "AU",
+    "type": "public",
+    "regions": ["TAS"]
+  },
+  {
+    "date": "2027-04-25",
+    "name": "Anzac Day",
+    "country": "AU",
+    "type": "public",
+    "regions": ["ALL"]
+  },
+  {
+    "date": "2027-04-26",
+    "name": "Anzac Day Holiday",
+    "country": "AU",
+    "type": "public",
+    "regions": ["ALL"],
+    "note": "Anzac Day falls on Sunday, observed on Monday"
+  },
+  {
+    "date": "2027-05-03",
+    "name": "Labour Day",
+    "country": "AU",
+    "type": "public",
+    "regions": ["QLD"]
+  },
+  {
+    "date": "2027-05-03",
+    "name": "May Day",
+    "country": "AU",
+    "type": "public",
+    "regions": ["NT"]
+  },
+  {
+    "date": "2027-06-07",
+    "name": "Western Australia Day",
+    "country": "AU",
+    "type": "public",
+    "regions": ["WA"]
+  },
+  {
+    "date": "2027-06-14",
+    "name": "Queen's Birthday",
+    "country": "AU",
+    "type": "public",
+    "regions": ["ACT", "NSW", "NT", "SA", "TAS", "VIC"]
+  },
+  {
+    "date": "2027-08-02",
+    "name": "Bank Holiday",
+    "country": "AU",
+    "type": "public",
+    "regions": ["NSW"]
+  },
+  {
+    "date": "2027-08-02",
+    "name": "Picnic Day",
+    "country": "AU",
+    "type": "public",
+    "regions": ["NT"]
+  },
+  {
+    "date": "2027-08-11",
+    "name": "Royal National Agricultural Show Day Queensland",
+    "country": "AU",
+    "type": "public",
+    "regions": ["QLD"]
+  },
+  {
+    "date": "2027-09-27",
+    "name": "Queen's Birthday",
+    "country": "AU",
+    "type": "public",
+    "regions": ["WA"]
+  },
+  {
+    "date": "2027-10-04",
+    "name": "Labour Day",
+    "country": "AU",
+    "type": "public",
+    "regions": ["ACT", "NSW", "SA"]
+  },
+  {
+    "date": "2027-11-02",
+    "name": "Melbourne Cup Day",
+    "country": "AU",
+    "type": "public",
+    "regions": ["VIC"]
+  },
+  {
+    "date": "2027-11-02",
+    "name": "Recreation Day",
+    "country": "AU",
+    "type": "public",
+    "regions": ["TAS"]
+  },
+  {
+    "date": "2027-12-25",
+    "name": "Christmas Day",
+    "country": "AU",
+    "type": "public",
+    "regions": ["ALL"]
+  },
+  {
+    "date": "2027-12-26",
+    "name": "Boxing Day",
+    "country": "AU",
+    "type": "public",
+    "regions": ["ALL"]
+  },
+  {
+    "date": "2027-12-27",
+    "name": "Christmas Day Holiday",
+    "country": "AU",
+    "type": "public",
+    "regions": ["ALL"],
+    "note": "Christmas Day falls on Saturday, observed on Monday"
+  },
+  {
+    "date": "2027-12-28",
+    "name": "Boxing Day Holiday",
+    "country": "AU",
+    "type": "public",
+    "regions": ["ALL"],
+    "note": "Boxing Day falls on Sunday, observed on Tuesday"
+  }
+]

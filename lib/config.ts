@@ -28,6 +28,9 @@ export interface AlmanacConfig {
   tags: {
     [key: string]: string;
   };
+  alarmEmail?: string;
+  cloudFrontDistributionId?: string;
+  testApiKey?: string;
 }
 
 export function getConfig(environment: string): AlmanacConfig {
@@ -66,6 +69,9 @@ export function getConfig(environment: string): AlmanacConfig {
       ManagedBy: 'CDK',
       CostCenter: 'Engineering',
     },
+    alarmEmail: process.env.ALARM_EMAIL,
+    cloudFrontDistributionId: 'E294HONVZ6GZA5',
+    testApiKey: 'LR1b6fK7Nc5fhRvwgsHTt1KcUjG4tMcM2g3KzALS',
   };
 
   // Environment-specific overrides

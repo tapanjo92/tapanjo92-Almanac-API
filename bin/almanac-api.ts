@@ -7,6 +7,8 @@ import { DataPipelineStack } from '../lib/stacks/data-pipeline-stack';
 import { ApiGatewayStack } from '../lib/stacks/api-gateway-stack';
 import { Phase3Stack } from '../lib/stacks/phase3-stack';
 import { CloudFrontStack } from '../lib/stacks/cloudfront-stack';
+import { Phase4ObservabilityStack } from '../lib/stacks/phase4-observability-stack';
+import { CognitoStack } from '../lib/stacks/cognito-stack';
 import { getConfig } from '../lib/config';
 
 const app = new cdk.App();
@@ -34,6 +36,13 @@ const dataPipelineStack = new DataPipelineStack(app, `AlmanacAPI-DataPipeline-${
   description: 'Almanac API Data Pipeline: ETL jobs, validation, and orchestration',
 });
 
+// Cognito Stack for authentication (deploy before Phase 1)
+const cognitoStack = new CognitoStack(app, `AlmanacAPI-Cognito-${env}`, {
+  env: stackEnv,
+  config: config,
+  description: 'Almanac API Cognito: User Pool and authentication',
+});
+
 // Phase 1: Core Infrastructure (Lambda functions)
 const phase1Stack = new Phase1Stack(app, `AlmanacAPI-Phase1-${env}`, {
   env: stackEnv,
@@ -47,6 +56,7 @@ const apiGatewayStack = new ApiGatewayStack(app, `AlmanacAPI-APIGateway-${env}`,
   env: stackEnv,
   config: config,
   phase1Stack: phase1Stack,
+  cognitoStack: cognitoStack,
   description: 'Almanac API Phase 2.2: API Gateway with endpoints and usage plans',
 });
 
@@ -66,6 +76,16 @@ const cloudFrontStack = new CloudFrontStack(app, `AlmanacAPI-CloudFront-${env}`,
   description: 'Almanac API CloudFront Distribution for global edge caching',
 });
 
+// Phase 4: Observability and Operations
+const phase4Stack = new Phase4ObservabilityStack(app, `AlmanacAPI-Phase4-${env}`, {
+  env: stackEnv,
+  config: config,
+  phase1Stack: phase1Stack,
+  apiGatewayStack: apiGatewayStack,
+  phase3Stack: phase3Stack,
+  description: 'Almanac API Phase 4: Observability and Operations',
+});
+
 // Add dependencies
 dataPipelineStack.addDependency(phase0Stack);
 phase1Stack.addDependency(phase0Stack);
@@ -73,3 +93,6 @@ apiGatewayStack.addDependency(phase1Stack);
 phase3Stack.addDependency(phase0Stack);
 // Note: Phase3 cannot depend on Phase1 due to circular dependency with custom resource
 cloudFrontStack.addDependency(apiGatewayStack);
+phase4Stack.addDependency(phase1Stack);
+phase4Stack.addDependency(apiGatewayStack);
+phase4Stack.addDependency(phase3Stack);

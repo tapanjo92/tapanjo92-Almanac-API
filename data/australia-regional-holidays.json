@@ -1,0 +1,71 @@
+[
+  {
+    "date": "2024-05-27",
+    "name": "Reconciliation Day",
+    "country": "AU",
+    "type": "public",
+    "regions": ["ACT"]
+  },
+  {
+    "date": "2025-05-26",
+    "name": "Reconciliation Day",
+    "country": "AU",
+    "type": "public",
+    "regions": ["ACT"]
+  },
+  {
+    "date": "2026-05-25",
+    "name": "Reconciliation Day",
+    "country": "AU",
+    "type": "public",
+    "regions": ["ACT"]
+  },
+  {
+    "date": "2024-08-14",
+    "name": "Royal Queensland Show (Ekka)",
+    "country": "AU",
+    "type": "public",
+    "regions": ["QLD"],
+    "note": "Brisbane area only"
+  },
+  {
+    "date": "2025-08-13",
+    "name": "Royal Queensland Show (Ekka)",
+    "country": "AU",
+    "type": "public",
+    "regions": ["QLD"],
+    "note": "Brisbane area only"
+  },
+  {
+    "date": "2026-08-12",
+    "name": "Royal Queensland Show (Ekka)",
+    "country": "AU",
+    "type": "public",
+    "regions": ["QLD"],
+    "note": "Brisbane area only"
+  },
+  {
+    "date": "2024-11-01",
+    "name": "AFL Grand Final Friday",
+    "country": "AU",
+    "type": "public",
+    "regions": ["VIC"],
+    "note": "Subject to AFL schedule"
+  },
+  {
+    "date": "2025-09-26",
+    "name": "AFL Grand Final Friday",
+    "country": "AU",
+    "type": "public",
+    "regions": ["VIC"],
+    "note": "Subject to AFL schedule"
+  },
+  {
+    "date": "2026-09-25",
+    "name": "AFL Grand Final Friday",
+    "country": "AU",
+    "type": "public",
+    "regions": ["VIC"],
+    "note": "Subject to AFL schedule"
+  }
+]

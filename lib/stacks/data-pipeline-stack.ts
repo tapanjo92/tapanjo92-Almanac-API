@@ -20,6 +20,7 @@ export class DataPipelineStack extends cdk.Stack {
   public readonly dataValidationLambda: lambda.Function;
   public readonly holidayETLJob: glue.CfnJob;
   public readonly timezoneETLJob: glue.CfnJob;
+  public readonly australiaHolidayETLJob: glue.CfnJob;
   public readonly dataQualityLambda: lambda.Function;
   public readonly pipelineStateMachine: stepfunctions.StateMachine;
 
@@ -39,6 +40,7 @@ export class DataPipelineStack extends cdk.Stack {
     // Create Glue ETL jobs
     this.holidayETLJob = this.createHolidayETLJob(config, phase0Stack);
     this.timezoneETLJob = this.createTimezoneETLJob(config, phase0Stack);
+    this.australiaHolidayETLJob = this.createAustraliaHolidayETLJob(config, phase0Stack);
 
     // Create Step Functions workflow
     this.pipelineStateMachine = this.createPipelineWorkflow(
@@ -50,6 +52,9 @@ export class DataPipelineStack extends cdk.Stack {
 
     // Create EventBridge rule for scheduled execution
     this.createScheduleRule(config);
+    
+    // Create monthly schedule for Australian holidays
+    this.createAustraliaHolidaySchedule(config);
 
     // Create outputs
     this.createOutputs();
@@ -410,6 +415,8 @@ function calculateOverallScore(metrics) {
     phase0Stack.stagingBucket.grantReadWrite(jobRole);
     phase0Stack.validatedBucket.grantWrite(jobRole);
     phase0Stack.holidaysTable.grantWriteData(jobRole);
+    // Grant permission to read Glue scripts
+    phase0Stack.glueScriptsBucket.grantRead(jobRole);
 
     return new glue.CfnJob(this, 'HolidayETLJob', {
       name: `${config.projectName}-${config.environment}-holiday-etl`,
@@ -439,6 +446,56 @@ function calculateOverallScore(metrics) {
     });
   }
 
+  private createAustraliaHolidayETLJob(config: AlmanacConfig, phase0Stack: Phase0Stack): glue.CfnJob {
+    const jobRole = new iam.Role(this, 'AustraliaHolidayETLJobRole', {
+      assumedBy: new iam.ServicePrincipal('glue.amazonaws.com'),
+      managedPolicies: [
+        iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSGlueServiceRole'),
+      ],
+    });
+
+    // Grant permissions
+    phase0Stack.rawBucket.grantReadWrite(jobRole);
+    phase0Stack.stagingBucket.grantReadWrite(jobRole);
+    phase0Stack.validatedBucket.grantWrite(jobRole);
+    phase0Stack.holidaysTable.grantWriteData(jobRole);
+    phase0Stack.glueScriptsBucket.grantRead(jobRole);
+
+    // Add SNS permissions for notifications
+    jobRole.addToPolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: ['sns:Publish'],
+      resources: [phase0Stack.approvalTopic.topicArn],
+    }));
+
+    return new glue.CfnJob(this, 'AustraliaHolidayETLJob', {
+      name: `${config.projectName}-${config.environment}-australia-holiday-etl`,
+      role: jobRole.roleArn,
+      command: {
+        name: 'glueetl',
+        pythonVersion: '3',
+        scriptLocation: `s3://${phase0Stack.glueScriptsBucket.bucketName}/scripts/australia_holiday_etl.py`,
+      },
+      defaultArguments: {
+        '--job-language': 'python',
+        '--enable-metrics': '',
+        '--enable-spark-ui': 'true',
+        '--spark-event-logs-path': `s3://${phase0Stack.glueScriptsBucket.bucketName}/spark-logs/`,
+        '--enable-continuous-cloudwatch-log': 'true',
+        '--enable-continuous-log-filter': 'true',
+        '--RAW_BUCKET': phase0Stack.rawBucket.bucketName,
+        '--STAGING_BUCKET': phase0Stack.stagingBucket.bucketName,
+        '--VALIDATED_BUCKET': phase0Stack.validatedBucket.bucketName,
+        '--HOLIDAYS_TABLE': phase0Stack.holidaysTable.tableName,
+        '--DATABASE_NAME': config.glue.databaseName,
+      },
+      maxRetries: 1,
+      timeout: 30, // 30 minutes
+      glueVersion: '4.0',
+      maxCapacity: 2,
+    });
+  }
+
   private createTimezoneETLJob(config: AlmanacConfig, phase0Stack: Phase0Stack): glue.CfnJob {
     const jobRole = new iam.Role(this, 'TimezoneETLJobRole', {
       assumedBy: new iam.ServicePrincipal('glue.amazonaws.com'),
@@ -452,6 +509,8 @@ function calculateOverallScore(metrics) {
     phase0Stack.stagingBucket.grantReadWrite(jobRole);
     phase0Stack.validatedBucket.grantWrite(jobRole);
     phase0Stack.timezonesTable.grantWriteData(jobRole);
+    // Grant permission to read Glue scripts
+    phase0Stack.glueScriptsBucket.grantRead(jobRole);
 
     return new glue.CfnJob(this, 'TimezoneETLJob', {
       name: `${config.projectName}-${config.environment}-timezone-etl`,
@@ -612,6 +671,52 @@ function calculateOverallScore(metrics) {
     rule.addTarget(new targets.SfnStateMachine(this.pipelineStateMachine));
   }
 
+  private createAustraliaHolidaySchedule(config: AlmanacConfig): void {
+    // Create a rule to run Australian holiday ETL monthly
+    const australiaRule = new events.Rule(this, 'AustraliaHolidaySchedule', {
+      ruleName: `${config.projectName}-${config.environment}-australia-holiday-schedule`,
+      description: 'Monthly Australian holiday data refresh',
+      schedule: events.Schedule.cron({
+        minute: '0',
+        hour: '2',
+        day: '1', // Run on 1st of each month
+      }),
+    });
+
+    // Create IAM role for EventBridge to start Glue job
+    const eventRole = new iam.Role(this, 'AustraliaHolidayScheduleRole', {
+      assumedBy: new iam.ServicePrincipal('events.amazonaws.com'),
+    });
+
+    eventRole.addToPolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: ['glue:StartJobRun'],
+      resources: [
+        `arn:aws:glue:${this.region}:${this.account}:job/${this.australiaHolidayETLJob.name}`,
+      ],
+    }));
+
+    // Add Glue job as target using the correct approach
+    australiaRule.addTarget(new targets.AwsApi({
+      service: 'Glue',
+      action: 'startJobRun',
+      parameters: {
+        JobName: this.australiaHolidayETLJob.name,
+      },
+      policyStatement: new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: ['glue:StartJobRun'],
+        resources: [`arn:aws:glue:${this.region}:${this.account}:job/${this.australiaHolidayETLJob.name}`],
+      }),
+    }));
+    
+    // Also create a CloudWatch dashboard widget for monitoring
+    new cdk.CfnOutput(this, 'AustraliaHolidayScheduleArn', {
+      value: australiaRule.ruleArn,
+      description: 'ARN of the Australia holiday ETL schedule rule',
+    });
+  }
+
   private createOutputs(): void {
     new cdk.CfnOutput(this, 'DataValidationLambdaArn', {
       value: this.dataValidationLambda.functionArn,
@@ -631,6 +736,11 @@ function calculateOverallScore(metrics) {
     new cdk.CfnOutput(this, 'TimezoneETLJobName', {
       value: this.timezoneETLJob.name!,
       description: 'Name of the timezone ETL Glue job',
+    });
+
+    new cdk.CfnOutput(this, 'AustraliaHolidayETLJobName', {
+      value: this.australiaHolidayETLJob.name!,
+      description: 'Name of the Australia holiday ETL Glue job',
     });
 
     new cdk.CfnOutput(this, 'PipelineStateMachineArn', {
