@@ -23,8 +23,7 @@ describe('Phase3Stack', () => {
     // In production, Phase3Stack would be deployed after Phase1Stack
     phase3Stack = new Phase3Stack(app, 'TestPhase3Stack', { 
       config, 
-      phase0Stack,
-      phase1Stack
+      phase0Stack
     });
     
     template = Template.fromStack(phase3Stack);

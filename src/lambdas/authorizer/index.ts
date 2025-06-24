@@ -54,9 +54,9 @@ export const handler = async (
         
         authContext = {
           cognitoSub: payload.sub,
-          tier: payload['custom:tier'] || 'free',
-          email: payload.email,
-          username: payload.username || payload['cognito:username'],
+          tier: String(payload['custom:tier'] || 'free'),
+          email: typeof payload.email === 'string' ? payload.email : undefined,
+          username: typeof payload.username === 'string' ? payload.username : (typeof payload['cognito:username'] === 'string' ? payload['cognito:username'] : undefined),
         };
         
         principalId = payload.sub;

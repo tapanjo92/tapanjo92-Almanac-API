@@ -21,7 +21,7 @@ documentClient = DynamoDBDocumentClient.from(dynamoDbClient, {
 if (process.env.DAX_ENDPOINT && process.env.AWS_EXECUTION_ENV) {
   try {
     const daxClient = new DAXClient({
-      endpoints: [process.env.DAX_ENDPOINT],
+      endpoint: process.env.DAX_ENDPOINT,
       region: process.env.AWS_REGION,
       requestHandler: {
         requestTimeout: 2000, // 2 second timeout for DAX
@@ -108,7 +108,7 @@ export class CachedDynamoDBClient {
     });
   }
 
-  async query(params: Omit<Parameters<typeof QueryCommand>[0], 'TableName'>): Promise<any> {
+  async query(params: Omit<QueryCommand['input'], 'TableName'>): Promise<any> {
     const fullParams = { ...params, TableName: this.tableName };
     
     // Check memory cache first
@@ -139,7 +139,7 @@ export class CachedDynamoDBClient {
     }
   }
 
-  async get(params: Omit<Parameters<typeof GetCommand>[0], 'TableName'>): Promise<any> {
+  async get(params: Omit<GetCommand['input'], 'TableName'>): Promise<any> {
     const fullParams = { ...params, TableName: this.tableName };
     
     // Check memory cache first
@@ -170,7 +170,7 @@ export class CachedDynamoDBClient {
     }
   }
 
-  async batchGet(params: Omit<Parameters<typeof BatchGetCommand>[0], 'RequestItems'>): Promise<any> {
+  async batchGet(params: { Keys: Record<string, any>[] } & Omit<BatchGetCommand['input'], 'RequestItems'>): Promise<any> {
     const fullParams = {
       ...params,
       RequestItems: {

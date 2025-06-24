@@ -9,6 +9,8 @@ import { Phase3Stack } from '../lib/stacks/phase3-stack';
 import { CloudFrontStack } from '../lib/stacks/cloudfront-stack';
 import { Phase4ObservabilityStack } from '../lib/stacks/phase4-observability-stack';
 import { CognitoStack } from '../lib/stacks/cognito-stack';
+import { ETLMetadataStack } from '../lib/stacks/etl-metadata-stack';
+import { UnifiedDataPipelineStack } from '../lib/stacks/unified-data-pipeline-stack';
 import { getConfig } from '../lib/config';
 
 const app = new cdk.App();
@@ -34,6 +36,22 @@ const dataPipelineStack = new DataPipelineStack(app, `AlmanacAPI-DataPipeline-${
   config: config,
   phase0Stack: phase0Stack,
   description: 'Almanac API Data Pipeline: ETL jobs, validation, and orchestration',
+});
+
+// ETL Metadata Stack (for tracking ETL runs)
+const etlMetadataStack = new ETLMetadataStack(app, `AlmanacAPI-ETLMetadata-${env}`, {
+  env: stackEnv,
+  config: config,
+  description: 'Almanac API ETL Metadata: Tracking and monitoring for ETL runs',
+});
+
+// Unified Data Pipeline Stack (replaces multiple ETL jobs)
+const unifiedPipelineStack = new UnifiedDataPipelineStack(app, `AlmanacAPI-UnifiedPipeline-${env}`, {
+  env: stackEnv,
+  config: config,
+  phase0Stack: phase0Stack,
+  metadataStack: etlMetadataStack,
+  description: 'Almanac API Unified Pipeline: Consolidated ETL with deduplication',
 });
 
 // Cognito Stack for authentication (deploy before Phase 1)
@@ -88,6 +106,9 @@ const phase4Stack = new Phase4ObservabilityStack(app, `AlmanacAPI-Phase4-${env}`
 
 // Add dependencies
 dataPipelineStack.addDependency(phase0Stack);
+etlMetadataStack.addDependency(phase0Stack);
+unifiedPipelineStack.addDependency(phase0Stack);
+unifiedPipelineStack.addDependency(etlMetadataStack);
 phase1Stack.addDependency(phase0Stack);
 apiGatewayStack.addDependency(phase1Stack);
 phase3Stack.addDependency(phase0Stack);
