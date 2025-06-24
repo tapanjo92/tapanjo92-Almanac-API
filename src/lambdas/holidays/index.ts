@@ -168,18 +168,15 @@ async function queryHolidays(params: HolidayQueryParams): Promise<Holiday[]> {
   const queryParams: any = {
     KeyConditionExpression: 'PK = :pk',
     ExpressionAttributeValues: {
-      ':pk': `COUNTRY#${params.country}`,
+      ':pk': `COUNTRY#${params.country}#${params.year}`,
     },
     ScanIndexForward: true, // Sort by date ascending
   };
 
-  // Add year/month filters
+  // Add month filter if provided
   if (params.month) {
     queryParams.KeyConditionExpression += ' AND begins_with(SK, :sk)';
-    queryParams.ExpressionAttributeValues[':sk'] = `DATE#${params.year}-${params.month.padStart(2, '0')}`;
-  } else {
-    queryParams.KeyConditionExpression += ' AND begins_with(SK, :sk)';
-    queryParams.ExpressionAttributeValues[':sk'] = `DATE#${params.year}`;
+    queryParams.ExpressionAttributeValues[':sk'] = `HOLIDAY#${params.year}-${String(params.month).padStart(2, '0')}`;
   }
 
   // Add type filter if provided

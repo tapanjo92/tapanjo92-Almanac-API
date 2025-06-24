@@ -156,13 +156,8 @@ async function fetchHolidays(
     const command = new QueryCommand({
       TableName: process.env.HOLIDAYS_TABLE,
       KeyConditionExpression: 'PK = :pk',
-      FilterExpression: '#year = :year',
-      ExpressionAttributeNames: {
-        '#year': 'year',
-      },
       ExpressionAttributeValues: {
-        ':pk': `COUNTRY#${country}`,
-        ':year': year,
+        ':pk': `COUNTRY#${country}#${year}`,
       },
     });
 

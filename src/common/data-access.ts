@@ -17,7 +17,7 @@ docClient = DynamoDBDocumentClient.from(dynamoClient);
 if (process.env.DAX_ENDPOINT) {
   try {
     const dax = new DAXClient({
-      endpoints: [process.env.DAX_ENDPOINT],
+      endpoint: process.env.DAX_ENDPOINT,
       region: process.env.AWS_REGION,
     });
     daxClient = DynamoDBDocumentClient.from(dax as any);
