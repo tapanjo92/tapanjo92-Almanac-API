@@ -228,7 +228,7 @@ function calculateBusinessDays(
 }
 
 function isValidCountryCode(code: string): boolean {
-  const validCodes = ['AU', 'UK', 'GB', 'DE'];
+  const validCodes = ['AU', 'UK', 'GB', 'DE', 'US', 'CA', 'NZ', 'FR', 'IT', 'ES'];
   return validCodes.includes(code);
 }
 
